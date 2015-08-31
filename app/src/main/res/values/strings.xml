@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">AlloCyclo</string>
+    <string name="title_activity_main">AlloCyclo</string>
+    <string name="title_activity_base">BaseActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="show_bikes">Show bikes</string>
+    <string name="show_docks">Show docks</string>
+</resources>
