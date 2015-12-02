@@ -1,21 +1,10 @@
-# Built application files
-*.apk
-*.ap_
-
-# Files for the Dalvik VM
-*.dex
-
-# Java class files
-*.class
-
 # Generated files
 bin/
 gen/
 
 # Gradle files
 .gradle/
-build/
-/*/build/
+/build
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -25,3 +14,24 @@ proguard/
 
 # Log Files
 *.log
+.idea/workspace.xml
+
+# Idea non-crucial project fileS
+/.idea
+*.iws﻿
+*.iml
+
+#Crashlytics
+.crashlytics_data
+com_crashlytics_export_strings.xml
+
+# Other
+out/
+.DS_Store
+tmp
+*.class
+classes.jar
+resources-debug-androidTest.ap_
+
+crop/build/outputs/aar/crop-debug.aar
+crop/build/outputs/aar/crop-release.aar
