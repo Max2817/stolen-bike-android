@@ -1,4 +1,4 @@
-package com.majateam.allocyclo;
+package com.majateam.spotbike;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

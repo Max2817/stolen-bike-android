@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.majateam.allocyclo" >
+    package="com.majateam.spotbike" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -34,14 +34,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".BaseActivity"
-            android:label="@string/title_activity_base" >
-        </activity>
 
         <provider
             android:name=".contentprovider.BikeContentProvider"
-            android:authorities="com.majateam.allocyclo.contentprovider"
+            android:authorities="com.majateam.spotbike.contentprovider"
             android:enabled="true"
             android:exported="true" >
         </provider>

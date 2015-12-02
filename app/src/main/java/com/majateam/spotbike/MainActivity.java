@@ -1,34 +1,32 @@
-package com.majateam.allocyclo;
+package com.majateam.spotbike;
 
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
-import com.majateam.allocyclo.helper.BikeLocationDbHelper;
-import com.majateam.allocyclo.model.Bike;
-import com.majateam.allocyclo.model.Dock;
-import com.majateam.allocyclo.provider.LocationProvider;
-import com.majateam.allocyclo.renderer.BikeRenderer;
-import com.majateam.allocyclo.service.LocationService;
+import com.majateam.spotbike.helper.BikeLocationDbHelper;
+import com.majateam.spotbike.model.Bike;
+import com.majateam.spotbike.model.Dock;
+import com.majateam.spotbike.provider.LocationProvider;
+import com.majateam.spotbike.renderer.BikeRenderer;
+import com.majateam.spotbike.service.LocationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +40,7 @@ import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class MainActivity extends BaseActivity implements LocationProvider.LocationCallback  {
+public class MainActivity extends BaseActivity implements LocationProvider.LocationCallback {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private LocationProvider mLocationProvider;
@@ -52,10 +50,19 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     private ClusterManager<ClusterItem> mClusterManager;
     private static final int BIKES = 10;
     private static final int DOCKS = 20;
+    private static final String CHOICE = "choice";
     private LayoutInflater mInflater;
     private PopupWindow mDropdown = null;
+    private int mChoice;
+
+    private Marker mUserMarker = null;
     @Bind(R.id.sub_menu)
     LinearLayout mSubMenu;
+    @Bind(R.id.display_choice)
+    TextView mDisplayChoice;
+    @Bind(R.id.show_choice_txt)
+    TextView mShowChoice;
+    @Bind(R.id.choice_icon
 
 
     @Override
@@ -63,25 +70,42 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
         Fabric.with(this, new Crashlytics());
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(com.majateam.spotbike.R.id.toolbar);
         setSupportActionBar(toolbar);
-        if(getSupportActionBar() != null)
+        if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        //set default choice
+
+        if(savedInstanceState != null) {
+            mChoice = savedInstanceState.getInt(CHOICE);
+            setChoice();
+        }else{
+            mChoice = BIKES;
+            mShowChoice.setText(com.majateam.spotbike.R.string.show_docks);
+            mDisplayChoice.setText(com.majateam.spotbike.R.string.bikes);
+        }
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_base, menu);
+        inflater.inflate(com.majateam.spotbike.R.menu.menu_base, menu);
         return true;
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(CHOICE, mChoice);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.item_menu:
+            case com.majateam.spotbike.R.id.item_menu:
                 showPopup();
                 return true;
             default:
@@ -90,73 +114,41 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     }
 
 
-
     public void showPopup() {
-        /*View menuItemView = findViewById(R.id.item_menu);
-        PopupMenu popup = new PopupMenu(this, menuItemView);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.menu_popup, popup.getMenu());
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.show_bikes:
-                        setClusterItems(BIKES);
-                        return true;
-                    case R.id.show_docks:
-                        setClusterItems(DOCKS);
-                        return true;
-                    default:
-                        return true;
-                }
-            }
-        });
-        popup.show();*/
         mSubMenu.setVisibility((mSubMenu.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
     }
 
-    @OnClick(R.id.show_bikes)
-    public void showBikes() {
-        setClusterItems(BIKES);
+    @OnClick(com.majateam.spotbike.R.id.show_choice)
+    public void showChoice() {
+        updateChoice();
         showPopup();
     }
 
-    @OnClick(R.id.show_docks)
-    public void showDocks() {
-        setClusterItems(DOCKS);
-        showPopup();
-    }
-
-    private PopupWindow initiatePopupWindow() {
-        View menuItemView = findViewById(R.id.item_menu);
-        try {
-
-            mInflater = (LayoutInflater) getApplicationContext()
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View layout = mInflater.inflate(R.layout.popup_window, null);
-
-            //If you want to add any listeners to your textviews, these are two //textviews.
-            //final TextView itema = (TextView) layout.findViewById(R.id.ItemA);
-
-
-            //final TextView itemb = (TextView) layout.findViewById(R.id.ItemB);
-
-
-
-            layout.measure(View.MeasureSpec.UNSPECIFIED,
-                    View.MeasureSpec.UNSPECIFIED);
-            mDropdown = new PopupWindow(layout, FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT,true);
-            Drawable background = getResources().getDrawable(android.R.drawable.editbox_dropdown_dark_frame);
-            mDropdown.setBackgroundDrawable(background);
-            mDropdown.showAsDropDown(menuItemView, 5, 5);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void updateChoice(){
+        if(mChoice == BIKES){
+            mChoice = DOCKS;
+            mShowChoice.setText(com.majateam.spotbike.R.string.show_bikes);
+            mDisplayChoice.setText(com.majateam.spotbike.R.string.docks);
+        }else{
+            mChoice = BIKES;
+            mShowChoice.setText(com.majateam.spotbike.R.string.show_docks);
+            mDisplayChoice.setText(com.majateam.spotbike.R.string.bikes);
         }
-        return mDropdown;
-
+        setClusterItems(mChoice);
     }
 
+    private void setChoice(){
+        if(mChoice == BIKES){
+            mChoice = BIKES;
+            mShowChoice.setText(com.majateam.spotbike.R.string.show_docks);
+            mDisplayChoice.setText(com.majateam.spotbike.R.string.bikes);
+        }else{
+            mChoice = DOCKS;
+            mShowChoice.setText(com.majateam.spotbike.R.string.show_bikes);
+            mDisplayChoice.setText(com.majateam.spotbike.R.string.docks);
+        }
+        setClusterItems(mChoice);
+    }
 
     @Override
     protected void onResume() {
@@ -182,16 +174,9 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             @Override
             public void success(List<Bike> returnedBikes, Response response) {
                 // Gets the data repository in write mode
-                SQLiteDatabase db = mDbHelper.getWritableDatabase();
-                mDbHelper.onInsertList(db, returnedBikes);
+                //SQLiteDatabase db = mDbHelper.getWritableDatabase();
+                //mDbHelper.onInsertList(db, returnedBikes);
                 bikes = returnedBikes;
-               /* for (Bike bike : bikes) {
-                    mMap.addMarker(
-                            new MarkerOptions()
-                                    .position(new LatLng(Double.parseDouble(bike.getLat()), Double.parseDouble(bike.getLng())))
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_stolen_bike_location))
-                    );
-                }*/
 
 
                 LocationService locationService = new RestAdapter.Builder()
@@ -202,7 +187,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                     @Override
                     public void success(List<Dock> returnedDocks, Response response) {
                         docks = returnedDocks;
-                        setClusterItems(BIKES);
+                        setClusterItems(mChoice);
                     }
 
                     @Override
@@ -222,10 +207,11 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
     private void setClusterItems(int type) {
         mClusterManager.clearItems();
-        if(type == BIKES)
+        if (type == BIKES && bikes != null) {
             mClusterManager.addItems(new ArrayList<ClusterItem>(bikes));
-        else
+        }else if(docks != null){
             mClusterManager.addItems(new ArrayList<ClusterItem>(docks));
+        }
         mClusterManager.cluster();
     }
 
@@ -236,21 +222,20 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     }
 
     public void handleNewLocation(Location location) {
-        Log.d(TAG, location.toString());
-
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
         LatLng latLng = new LatLng(currentLatitude, currentLongitude);
+        GoogleMap map = getMap();
+        if(mUserMarker == null){
+            MarkerOptions options = new MarkerOptions().position(latLng)
+                    .icon(BitmapDescriptorFactory.fromResource(com.majateam.spotbike.R.drawable.ic_user_location));
+            mUserMarker = map.addMarker(options);
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLatitude, currentLongitude), 15.0f));
+        }else{
+            mUserMarker.setPosition(latLng);
+        }
 
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(currentLatitude, currentLongitude)).title("Current Location"));
-        MarkerOptions options = new MarkerOptions()
-                .position(latLng)
-                .title("I am here!")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_user_location));
-        getMap().addMarker(options);
-        getMap().animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLatitude, currentLongitude), 17.0f));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        //  mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 17.0f));
+
     }
 
 

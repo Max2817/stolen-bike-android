@@ -1,4 +1,4 @@
-package com.majateam.allocyclo.renderer;
+package com.majateam.spotbike.renderer;
 
 import android.content.Context;
 
@@ -9,8 +9,8 @@ import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-import com.majateam.allocyclo.R;
-import com.majateam.allocyclo.model.Bike;
+import com.majateam.spotbike.R;
+import com.majateam.spotbike.model.Bike;
 
 /**
  * Draws profile photos inside markers (using IconGenerator).
@@ -18,8 +18,10 @@ import com.majateam.allocyclo.model.Bike;
  */
 public class BikeRenderer extends DefaultClusterRenderer<ClusterItem> {
 
+    private Context mContext;
     public BikeRenderer(Context context, GoogleMap map, ClusterManager<ClusterItem> clusterManager) {
         super(context, map, clusterManager);
+        mContext = context;
     }
 
     @Override
@@ -27,7 +29,7 @@ public class BikeRenderer extends DefaultClusterRenderer<ClusterItem> {
         // Draw a single person.
         // Set the info window to show their name.
         if(clusterItem instanceof Bike)
-            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_stolen_bike_location));
+            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_stolen_bike_location)).title(mContext.getString(R.string.stolen_on) + " " + ((Bike) clusterItem).getDate());
         else
             markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_dock_location));
         super.onBeforeClusterItemRendered(clusterItem, markerOptions);

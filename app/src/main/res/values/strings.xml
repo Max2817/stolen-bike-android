@@ -1,8 +1,11 @@
 <resources>
-    <string name="app_name">AlloCyclo</string>
-    <string name="title_activity_main">AlloCyclo</string>
-    <string name="title_activity_base">BaseActivity</string>
+    <string name="app_name">SpotBike</string>
+    <string name="title_activity_main">SpotBike</string>
     <string name="action_settings">Settings</string>
-    <string name="show_bikes">Show bikes</string>
-    <string name="show_docks">Show docks</string>
+    <string name="show_bikes">Show spotted stolen bikes</string>
+    <string name="show_docks">Show bikes docks</string>
+    <string name="bikes">Spotted stolen bikes</string>
+    <string name="docks">Bike docks</string>
+    <string name="stolen_on">Stolen on</string>
+    <string name="choice_icon">choice icon</string>
 </resources>

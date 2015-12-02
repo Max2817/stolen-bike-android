@@ -1,19 +1,19 @@
-package com.majateam.allocyclo.database;
+package com.majateam.spotbike.database;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
-import com.majateam.allocyclo.model.Bike;
+import com.majateam.spotbike.model.Bike;
 
 import java.util.List;
 
 /**
- * Created by Nicolas Martino on 29/06/15.
+ * Created by Nicolas Martino on 16/06/15.
  */
-public class ParkingTable {
+public class BikeTable {
 
-    public static final String TABLE_NAME = "parking";
+    public static final String TABLE_NAME = "bike";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_NAME_LAT = "lat";
     public static final String COLUMN_NAME_LNG = "lng";

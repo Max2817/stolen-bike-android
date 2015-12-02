@@ -1,7 +1,7 @@
-package com.majateam.allocyclo.service;
+package com.majateam.spotbike.service;
 
-import com.majateam.allocyclo.model.Bike;
-import com.majateam.allocyclo.model.Dock;
+import com.majateam.spotbike.model.Bike;
+import com.majateam.spotbike.model.Dock;
 
 import java.util.List;
 

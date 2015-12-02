@@ -1,11 +1,11 @@
-package com.majateam.allocyclo.helper;
+package com.majateam.spotbike.helper;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.majateam.allocyclo.database.BikeTable;
-import com.majateam.allocyclo.model.Bike;
+import com.majateam.spotbike.database.BikeTable;
+import com.majateam.spotbike.model.Bike;
 
 import java.util.List;
 

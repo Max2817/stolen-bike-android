@@ -1,4 +1,4 @@
-package com.majateam.allocyclo.contentprovider;
+package com.majateam.spotbike.contentprovider;
 
 import android.content.ContentProvider;
 import android.content.ContentResolver;
@@ -10,8 +10,8 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.majateam.allocyclo.database.BikeTable;
-import com.majateam.allocyclo.helper.BikeLocationDbHelper;
+import com.majateam.spotbike.database.BikeTable;
+import com.majateam.spotbike.helper.BikeLocationDbHelper;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -25,7 +25,7 @@ public class BikeContentProvider extends ContentProvider {
     private static final int BIKES = 10;
     private static final int BIKE_ID = 20;
 
-    private static final String AUTHORITY = "com.majateam.allocyclo.contenprovider";
+    private static final String AUTHORITY = "com.majateam.spotbike.contenprovider";
 
     private static final String BASE_PATH = "bikes";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY

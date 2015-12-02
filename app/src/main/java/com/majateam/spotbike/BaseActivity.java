@@ -1,4 +1,4 @@
-package com.majateam.allocyclo;
+package com.majateam.spotbike;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +12,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     private GoogleMap mMap;
 
     protected int getLayoutId() {
-        return R.layout.map;
+        return com.majateam.spotbike.R.layout.map;
     }
 
     @Override
@@ -32,7 +32,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (mMap != null) {
             return;
         }
-        mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+        mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(com.majateam.spotbike.R.id.map)).getMap();
         if (mMap != null) {
             startDemo();
         }

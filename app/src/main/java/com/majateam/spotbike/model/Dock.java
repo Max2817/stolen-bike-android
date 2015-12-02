@@ -1,4 +1,4 @@
-package com.majateam.allocyclo.model;
+package com.majateam.spotbike.model;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
@@ -6,8 +6,7 @@ import com.google.maps.android.clustering.ClusterItem;
 /**
  * Created by Nicolas Martino on 08/06/15.
  */
-public class Bike implements ClusterItem {
-
+public class Dock implements ClusterItem {
     private String lat;
     private String lng;
 
@@ -30,9 +29,7 @@ public class Bike implements ClusterItem {
 
     // To prevent someone from accidentally instantiating the contract class,
     // give it an empty constructor.
-    public Bike() {
-
-    }
+    public Dock() {}
 
     @Override
     public LatLng getPosition() {

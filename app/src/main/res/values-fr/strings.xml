@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SpotBike</string>
+    <string name="title_activity_main">SpotBike</string>
+    <string name="action_settings">Parametres</string>
+    <string name="show_bikes">Voir les vélos volés</string>
+    <string name="show_docks">Voir les emplacements à vélo</string>
+    <string name="bikes">Vélos volés</string>
+    <string name="docks">Emplacements à vélo</string>
+    <string name="stolen_on">Volé le</string>
+    <string name="choice_icon">icone de choix</string>
+</resources>

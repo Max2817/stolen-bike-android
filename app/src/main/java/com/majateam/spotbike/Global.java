@@ -1,4 +1,4 @@
-package com.majateam.allocyclo;
+package com.majateam.spotbike;
 
 /**
  * Created by Nicolas Martino on 10/06/15.
