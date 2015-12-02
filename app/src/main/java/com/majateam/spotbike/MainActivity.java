@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -62,7 +63,10 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     TextView mDisplayChoice;
     @Bind(R.id.show_choice_txt)
     TextView mShowChoice;
-    @Bind(R.id.choice_icon
+    @Bind(R.id.choice_icon)
+    ImageView mChoiceIcon;
+    @Bind(R.id.show_icon)
+    ImageView mShowIcon;
 
 
     @Override
@@ -84,6 +88,8 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             mChoice = BIKES;
             mShowChoice.setText(com.majateam.spotbike.R.string.show_docks);
             mDisplayChoice.setText(com.majateam.spotbike.R.string.bikes);
+            mChoiceIcon.setImageResource(R.drawable.ic_stolen_bike_location);
+            mShowIcon.setImageResource(R.drawable.ic_dock_location);
         }
 
     }
@@ -129,10 +135,14 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             mChoice = DOCKS;
             mShowChoice.setText(com.majateam.spotbike.R.string.show_bikes);
             mDisplayChoice.setText(com.majateam.spotbike.R.string.docks);
+            mChoiceIcon.setImageResource(R.drawable.ic_dock_location);
+            mShowIcon.setImageResource(R.drawable.ic_stolen_bike_location);
         }else{
             mChoice = BIKES;
             mShowChoice.setText(com.majateam.spotbike.R.string.show_docks);
             mDisplayChoice.setText(com.majateam.spotbike.R.string.bikes);
+            mChoiceIcon.setImageResource(R.drawable.ic_stolen_bike_location);
+            mShowIcon.setImageResource(R.drawable.ic_dock_location);
         }
         setClusterItems(mChoice);
     }

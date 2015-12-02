@@ -36,7 +36,9 @@
                     android:id="@+id/choice_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/choice_icon"/>
+                    android:contentDescription="@string/choice_icon"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"/>
                 <TextView
                     android:id="@+id/display_choice"
                     android:layout_width="0dp"
@@ -45,7 +47,8 @@
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/black"
+                    android:textAllCaps="true"/>
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
@@ -70,14 +73,29 @@
                 android:layout_marginRight="8dp"
                 card_view:cardBackgroundColor="@android:color/white">
 
-                <TextView android:id="@+id/show_choice_txt"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginStart="12dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/show_bikes"
-                    android:textColor="@android:color/black" />
+                    android:gravity="center_vertical">
+                    <ImageView
+                        android:id="@+id/show_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/choice_icon"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"/>
+
+                    <TextView android:id="@+id/show_choice_txt"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginStart="12dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/show_bikes"
+                        android:textColor="@android:color/black"
+                        android:textAllCaps="true"/>
+
+                </LinearLayout>
             </android.support.v7.widget.CardView>
 
         </LinearLayout>
