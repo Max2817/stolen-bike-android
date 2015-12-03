@@ -48,6 +48,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     private static final int BIKES = 10;
     private static final int DOCKS = 20;
     private static final String CHOICE = "choice";
+    private static final String MENU_VISIBILITY = "menu_visibility";
     private LayoutInflater mInflater;
     private PopupWindow mDropdown = null;
     private int mChoice;
@@ -79,6 +80,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
         if(savedInstanceState != null) {
             mChoice = savedInstanceState.getInt(CHOICE);
+            mSubMenu.setVisibility((savedInstanceState.getInt(MENU_VISIBILITY) == View.VISIBLE) ? View.VISIBLE : View.GONE);
             setChoice();
         }else{
             mChoice = BIKES;
@@ -101,6 +103,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(CHOICE, mChoice);
+        outState.putInt(MENU_VISIBILITY, mSubMenu.getVisibility());
     }
 
     /*@Override
@@ -148,10 +151,14 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             mChoice = BIKES;
             mShowChoice.setText(com.majateam.spotbike.R.string.show_docks);
             mDisplayChoice.setText(com.majateam.spotbike.R.string.bikes);
+            mChoiceIcon.setImageResource(R.drawable.ic_stolen_bike_location);
+            mShowIcon.setImageResource(R.drawable.ic_dock_location);
         }else{
             mChoice = DOCKS;
             mShowChoice.setText(com.majateam.spotbike.R.string.show_bikes);
             mDisplayChoice.setText(com.majateam.spotbike.R.string.docks);
+            mChoiceIcon.setImageResource(R.drawable.ic_dock_location);
+            mShowIcon.setImageResource(R.drawable.ic_stolen_bike_location);
         }
         setClusterItems(mChoice);
     }
