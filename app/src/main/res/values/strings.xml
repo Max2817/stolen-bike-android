@@ -8,4 +8,5 @@
     <string name="docks">Bike docks</string>
     <string name="stolen_on">Stolen on</string>
     <string name="choice_icon">choice icon</string>
+    <string name="menu_icon">menu icon</string>
 </resources>

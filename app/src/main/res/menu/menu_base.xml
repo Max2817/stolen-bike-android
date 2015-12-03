@@ -8,5 +8,5 @@
         android:title=""
         android:icon="@drawable/ic_more_vert_white_24dp"
         android:enabled="true"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom|withText" />
 </menu>

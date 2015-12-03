@@ -2,11 +2,7 @@ package com.majateam.spotbike;
 
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -74,10 +70,10 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
         Fabric.with(this, new Crashlytics());
-        Toolbar toolbar = (Toolbar) findViewById(com.majateam.spotbike.R.id.toolbar);
+        /*Toolbar toolbar = (Toolbar) findViewById(com.majateam.spotbike.R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);*/
 
         //set default choice
 
@@ -94,12 +90,12 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(com.majateam.spotbike.R.menu.menu_base, menu);
         return true;
-    }
+    }*/
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -107,7 +103,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         outState.putInt(CHOICE, mChoice);
     }
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
@@ -117,9 +113,9 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
+    }*/
 
-
+    @OnClick(R.id.menu_icon)
     public void showPopup() {
         mSubMenu.setVisibility((mSubMenu.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
     }
