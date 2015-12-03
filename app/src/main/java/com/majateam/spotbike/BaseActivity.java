@@ -1,4 +1,4 @@
-package com.majateam.spotbike;
+package com.majateam.bikespot;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +12,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     private GoogleMap mMap;
 
     protected int getLayoutId() {
-        return com.majateam.spotbike.R.layout.map;
+        return com.majateam.bikespot.R.layout.map;
     }
 
     @Override
@@ -32,7 +32,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (mMap != null) {
             return;
         }
-        mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(com.majateam.spotbike.R.id.map)).getMap();
+        mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(com.majateam.bikespot.R.id.map)).getMap();
         if (mMap != null) {
             startDemo();
         }

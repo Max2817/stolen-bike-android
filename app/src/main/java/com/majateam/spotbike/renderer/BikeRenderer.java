@@ -1,4 +1,4 @@
-package com.majateam.spotbike.renderer;
+package com.majateam.bikespot.renderer;
 
 import android.content.Context;
 
@@ -9,8 +9,8 @@ import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-import com.majateam.spotbike.R;
-import com.majateam.spotbike.model.Bike;
+import com.majateam.bikespot.R;
+import com.majateam.bikespot.model.Bike;
 
 /**
  * Draws profile photos inside markers (using IconGenerator).

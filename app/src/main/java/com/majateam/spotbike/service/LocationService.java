@@ -1,7 +1,7 @@
-package com.majateam.spotbike.service;
+package com.majateam.bikespot.service;
 
-import com.majateam.spotbike.model.Bike;
-import com.majateam.spotbike.model.Dock;
+import com.majateam.bikespot.model.Bike;
+import com.majateam.bikespot.model.Dock;
 
 import java.util.List;
 

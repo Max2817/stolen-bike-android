@@ -1,4 +1,4 @@
-package com.majateam.spotbike.model;
+package com.majateam.bikespot.model;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;

@@ -1,4 +1,4 @@
-package com.majateam.spotbike.provider;
+package com.majateam.bikespot.provider;
 
 import android.app.Activity;
 import android.content.Context;

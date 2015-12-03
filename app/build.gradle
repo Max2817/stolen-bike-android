@@ -20,7 +20,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "com.majateam.spotbike"
+        applicationId "com.majateam.bikespot"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1

@@ -1,4 +1,4 @@
-package com.majateam.spotbike.model;
+package com.majateam.bikespot.model;
 
 import android.text.format.DateFormat;
 

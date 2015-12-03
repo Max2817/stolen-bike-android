@@ -1,4 +1,4 @@
-package com.majateam.spotbike;
+package com.majateam.bikespot;
 
 import android.location.Location;
 import android.os.Bundle;
@@ -18,12 +18,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
-import com.majateam.spotbike.helper.BikeLocationDbHelper;
-import com.majateam.spotbike.model.Bike;
-import com.majateam.spotbike.model.Dock;
-import com.majateam.spotbike.provider.LocationProvider;
-import com.majateam.spotbike.renderer.BikeRenderer;
-import com.majateam.spotbike.service.LocationService;
+import com.majateam.bikespot.helper.BikeLocationDbHelper;
+import com.majateam.bikespot.model.Bike;
+import com.majateam.bikespot.model.Dock;
+import com.majateam.bikespot.provider.LocationProvider;
+import com.majateam.bikespot.renderer.BikeRenderer;
+import com.majateam.bikespot.service.LocationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
         Fabric.with(this, new Crashlytics());
-        /*Toolbar toolbar = (Toolbar) findViewById(com.majateam.spotbike.R.id.toolbar);
+        /*Toolbar toolbar = (Toolbar) findViewById(com.majateam.bikespot.R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);*/
@@ -84,8 +84,8 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             setChoice();
         }else{
             mChoice = BIKES;
-            mShowChoice.setText(com.majateam.spotbike.R.string.show_docks);
-            mDisplayChoice.setText(com.majateam.spotbike.R.string.bikes);
+            mShowChoice.setText(com.majateam.bikespot.R.string.show_docks);
+            mDisplayChoice.setText(com.majateam.bikespot.R.string.bikes);
             mChoiceIcon.setImageResource(R.drawable.ic_stolen_bike_location);
             mShowIcon.setImageResource(R.drawable.ic_dock_location);
         }
@@ -95,7 +95,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(com.majateam.spotbike.R.menu.menu_base, menu);
+        inflater.inflate(com.majateam.bikespot.R.menu.menu_base, menu);
         return true;
     }*/
 
@@ -110,7 +110,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case com.majateam.spotbike.R.id.item_menu:
+            case com.majateam.bikespot.R.id.item_menu:
                 showPopup();
                 return true;
             default:
@@ -123,7 +123,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         mSubMenu.setVisibility((mSubMenu.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
     }
 
-    @OnClick(com.majateam.spotbike.R.id.show_choice)
+    @OnClick(com.majateam.bikespot.R.id.show_choice)
     public void showChoice() {
         updateChoice();
         showPopup();
@@ -132,14 +132,14 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     private void updateChoice(){
         if(mChoice == BIKES){
             mChoice = DOCKS;
-            mShowChoice.setText(com.majateam.spotbike.R.string.show_bikes);
-            mDisplayChoice.setText(com.majateam.spotbike.R.string.docks);
+            mShowChoice.setText(com.majateam.bikespot.R.string.show_bikes);
+            mDisplayChoice.setText(com.majateam.bikespot.R.string.docks);
             mChoiceIcon.setImageResource(R.drawable.ic_dock_location);
             mShowIcon.setImageResource(R.drawable.ic_stolen_bike_location);
         }else{
             mChoice = BIKES;
-            mShowChoice.setText(com.majateam.spotbike.R.string.show_docks);
-            mDisplayChoice.setText(com.majateam.spotbike.R.string.bikes);
+            mShowChoice.setText(com.majateam.bikespot.R.string.show_docks);
+            mDisplayChoice.setText(com.majateam.bikespot.R.string.bikes);
             mChoiceIcon.setImageResource(R.drawable.ic_stolen_bike_location);
             mShowIcon.setImageResource(R.drawable.ic_dock_location);
         }
@@ -149,14 +149,14 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     private void setChoice(){
         if(mChoice == BIKES){
             mChoice = BIKES;
-            mShowChoice.setText(com.majateam.spotbike.R.string.show_docks);
-            mDisplayChoice.setText(com.majateam.spotbike.R.string.bikes);
+            mShowChoice.setText(com.majateam.bikespot.R.string.show_docks);
+            mDisplayChoice.setText(com.majateam.bikespot.R.string.bikes);
             mChoiceIcon.setImageResource(R.drawable.ic_stolen_bike_location);
             mShowIcon.setImageResource(R.drawable.ic_dock_location);
         }else{
             mChoice = DOCKS;
-            mShowChoice.setText(com.majateam.spotbike.R.string.show_bikes);
-            mDisplayChoice.setText(com.majateam.spotbike.R.string.docks);
+            mShowChoice.setText(com.majateam.bikespot.R.string.show_bikes);
+            mDisplayChoice.setText(com.majateam.bikespot.R.string.docks);
             mChoiceIcon.setImageResource(R.drawable.ic_dock_location);
             mShowIcon.setImageResource(R.drawable.ic_stolen_bike_location);
         }
@@ -241,7 +241,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         GoogleMap map = getMap();
         if(mUserMarker == null){
             MarkerOptions options = new MarkerOptions().position(latLng)
-                    .icon(BitmapDescriptorFactory.fromResource(com.majateam.spotbike.R.drawable.ic_user_location));
+                    .icon(BitmapDescriptorFactory.fromResource(com.majateam.bikespot.R.drawable.ic_user_location));
             mUserMarker = map.addMarker(options);
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLatitude, currentLongitude), 15.0f));
         }else{

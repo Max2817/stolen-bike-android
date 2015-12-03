@@ -1,4 +1,4 @@
-package com.majateam.spotbike;
+package com.majateam.bikespot;
 
 /**
  * Created by Nicolas Martino on 10/06/15.

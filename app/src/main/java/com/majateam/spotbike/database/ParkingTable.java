@@ -1,10 +1,10 @@
-package com.majateam.spotbike.database;
+package com.majateam.bikespot.database;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
-import com.majateam.spotbike.model.Bike;
+import com.majateam.bikespot.model.Bike;
 
 import java.util.List;
 

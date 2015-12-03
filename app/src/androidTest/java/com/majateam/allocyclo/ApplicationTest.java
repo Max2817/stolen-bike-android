@@ -1,4 +1,4 @@
-package com.majateam.spotbike;
+package com.majateam.bikespot;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
