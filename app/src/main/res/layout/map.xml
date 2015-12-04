@@ -38,8 +38,7 @@
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/choice_icon"
                     android:layout_marginLeft="8dp"
-                    android:layout_marginStart="8dp"
-                    android:visibility="gone"/>
+                    android:layout_marginStart="8dp"/>
                 <TextView
                     android:id="@+id/display_choice"
                     android:layout_width="0dp"
