@@ -86,8 +86,8 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             mChoice = BIKES;
             mShowChoice.setText(com.majateam.bikespot.R.string.show_docks);
             mDisplayChoice.setText(com.majateam.bikespot.R.string.bikes);
-            mChoiceIcon.setImageResource(R.drawable.ic_stolen_bike_location);
-            mShowIcon.setImageResource(R.drawable.ic_dock_location);
+            mChoiceIcon.setImageResource(R.drawable.ic_legend_stolen);
+            mShowIcon.setImageResource(R.drawable.ic_legend_dock);
         }
 
     }
@@ -134,14 +134,14 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             mChoice = DOCKS;
             mShowChoice.setText(com.majateam.bikespot.R.string.show_bikes);
             mDisplayChoice.setText(com.majateam.bikespot.R.string.docks);
-            mChoiceIcon.setImageResource(R.drawable.ic_dock_location);
-            mShowIcon.setImageResource(R.drawable.ic_stolen_bike_location);
+            mChoiceIcon.setImageResource(R.drawable.ic_legend_dock);
+            mShowIcon.setImageResource(R.drawable.ic_legend_stolen);
         }else{
             mChoice = BIKES;
             mShowChoice.setText(com.majateam.bikespot.R.string.show_docks);
             mDisplayChoice.setText(com.majateam.bikespot.R.string.bikes);
-            mChoiceIcon.setImageResource(R.drawable.ic_stolen_bike_location);
-            mShowIcon.setImageResource(R.drawable.ic_dock_location);
+            mChoiceIcon.setImageResource(R.drawable.ic_legend_stolen);
+            mShowIcon.setImageResource(R.drawable.ic_legend_dock);
         }
         setClusterItems(mChoice);
     }
@@ -151,14 +151,14 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             mChoice = BIKES;
             mShowChoice.setText(com.majateam.bikespot.R.string.show_docks);
             mDisplayChoice.setText(com.majateam.bikespot.R.string.bikes);
-            mChoiceIcon.setImageResource(R.drawable.ic_stolen_bike_location);
-            mShowIcon.setImageResource(R.drawable.ic_dock_location);
+            mChoiceIcon.setImageResource(R.drawable.ic_legend_stolen);
+            mShowIcon.setImageResource(R.drawable.ic_legend_dock);
         }else{
             mChoice = DOCKS;
             mShowChoice.setText(com.majateam.bikespot.R.string.show_bikes);
             mDisplayChoice.setText(com.majateam.bikespot.R.string.docks);
-            mChoiceIcon.setImageResource(R.drawable.ic_dock_location);
-            mShowIcon.setImageResource(R.drawable.ic_stolen_bike_location);
+            mChoiceIcon.setImageResource(R.drawable.ic_legend_dock);
+            mShowIcon.setImageResource(R.drawable.ic_legend_stolen);
         }
         setClusterItems(mChoice);
     }
