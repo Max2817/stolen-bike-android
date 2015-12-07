@@ -23,7 +23,7 @@ android {
         applicationId "com.majateam.bikespot"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 3
+        versionCode 105
         versionName "1.0"
     }
     buildTypes {
