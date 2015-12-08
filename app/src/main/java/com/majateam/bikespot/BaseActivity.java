@@ -34,8 +34,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
         mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(com.majateam.bikespot.R.id.map)).getMap();
         if (mMap != null) {
-            //mMap.setMyLocationEnabled(true);
-            //mMap.getUiSettings().setMyLocationButtonEnabled(true);
             startDemo();
         }
     }

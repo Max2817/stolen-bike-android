@@ -52,6 +52,8 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     private LayoutInflater mInflater;
     private PopupWindow mDropdown = null;
     private int mChoice;
+    private double mCurrentLatitude;
+    private double mCurrentLongitude;
 
     private Marker mUserMarker = null;
     @Bind(R.id.sub_menu)
@@ -92,13 +94,6 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
     }
 
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(com.majateam.bikespot.R.menu.menu_base, menu);
-        return true;
-    }*/
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -106,17 +101,6 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         outState.putInt(MENU_VISIBILITY, mSubMenu.getVisibility());
     }
 
-    /*@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case com.majateam.bikespot.R.id.item_menu:
-                showPopup();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }*/
 
     @OnClick(R.id.menu_icon)
     public void showPopup() {
@@ -235,20 +219,28 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     }
 
     public void handleNewLocation(Location location) {
-        double currentLatitude = location.getLatitude();
-        double currentLongitude = location.getLongitude();
-        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
+        mCurrentLatitude = location.getLatitude();
+        mCurrentLongitude = location.getLongitude();
+        LatLng latLng = new LatLng(mCurrentLatitude, mCurrentLongitude);
         GoogleMap map = getMap();
         if(mUserMarker == null){
             MarkerOptions options = new MarkerOptions().position(latLng)
                     .icon(BitmapDescriptorFactory.fromResource(com.majateam.bikespot.R.drawable.ic_user_location));
             mUserMarker = map.addMarker(options);
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLatitude, currentLongitude), 15.0f));
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));
         }else{
             mUserMarker.setPosition(latLng);
         }
 
 
+    }
+
+    @OnClick(R.id.map_user_location)
+    public void showUserLocation() {
+        GoogleMap map = getMap();
+        if(map != null) {
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));
+        }
     }
 
 
