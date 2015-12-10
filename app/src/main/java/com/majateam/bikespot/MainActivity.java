@@ -9,6 +9,9 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.akexorcist.googledirection.DirectionCallback;
+import com.akexorcist.googledirection.GoogleDirection;
+import com.akexorcist.googledirection.model.Direction;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,10 +35,11 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.fabric.sdk.android.Fabric;
+import retrofit.Call;
 import retrofit.Callback;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit.GsonConverterFactory;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 public class MainActivity extends BaseActivity implements LocationProvider.LocationCallback {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -155,51 +159,48 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
     @Override
     protected void startDemo() {
+
         mLocationProvider = new LocationProvider(this, this);
         mClusterManager = new ClusterManager<>(this, getMap());
         mClusterManager.setRenderer(new BikeRenderer(getApplicationContext(), getMap(), mClusterManager));
         getMap().setOnCameraChangeListener(mClusterManager);
 
-        //Call the bikes
-        LocationService locationService = new RestAdapter.Builder()
-                .setEndpoint(Global.ENDPOINT)
-                .build()
-                .create(LocationService.class);
-        mDbHelper = new BikeLocationDbHelper(this);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Global.ENDPOINT)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        final LocationService service = retrofit.create(LocationService.class);
 
-        locationService.listBikes(new Callback<List<Bike>>() {
+        Call<List<Bike>> callBikes = service.listBikes();
+        callBikes.enqueue(new Callback<List<Bike>>() {
+
             @Override
-            public void success(List<Bike> returnedBikes, Response response) {
-                // Gets the data repository in write mode
-                //SQLiteDatabase db = mDbHelper.getWritableDatabase();
-                //mDbHelper.onInsertList(db, returnedBikes);
-                bikes = returnedBikes;
+            public void onResponse(Response<List<Bike>> response, Retrofit retrofit) {
 
+                bikes = response.body();
 
-                LocationService locationService = new RestAdapter.Builder()
-                        .setEndpoint(Global.ENDPOINT)
-                        .build()
-                        .create(LocationService.class);
-                locationService.listDocks(new Callback<List<Dock>>() {
+                Call<List<Dock>> callDocks = service.listDocks();
+                callDocks.enqueue(new Callback<List<Dock>>() {
+
                     @Override
-                    public void success(List<Dock> returnedDocks, Response response) {
-                        docks = returnedDocks;
+                    public void onResponse(Response<List<Dock>> response, Retrofit retrofit) {
+                        docks = response.body();
                         setClusterItems(mChoice);
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
+                    public void onFailure(Throwable t) {
                         // you should handle errors, too
                     }
                 });
-
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Throwable t) {
                 // you should handle errors, too
             }
         });
+
     }
 
     private void setClusterItems(int type) {
@@ -234,13 +235,32 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
 
     }
+    //Direction server key AIzaSyDNtlRTiYN4cNhjmO3Zzzghg0I7mV5i9bc
 
     @OnClick(R.id.map_user_location)
     public void showUserLocation() {
-        GoogleMap map = getMap();
+        /*GoogleMap map = getMap();
         if(map != null) {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));
-        }
+        }*/
+        String serverKey = "AIzaSyDNtlRTiYN4cNhjmO3Zzzghg0I7mV5i9bc";
+        LatLng origin = new LatLng(37.7849569, -122.4068855);
+        LatLng destination = new LatLng(37.7814432, -122.4460177);
+        GoogleDirection.withServerKey(serverKey)
+                .from(origin)
+                .to(destination)
+                .execute(new DirectionCallback() {
+                    @Override
+                    public void onDirectionSuccess(Direction direction) {
+                        // Do something here
+                    }
+
+                    @Override
+                    public void onDirectionFailure(Throwable t) {
+                        // Do something here
+                    }
+                });
+
     }
 
 

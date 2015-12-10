@@ -5,7 +5,7 @@ import com.majateam.bikespot.model.Dock;
 
 import java.util.List;
 
-import retrofit.Callback;
+import retrofit.Call;
 import retrofit.http.GET;
 
 /**
@@ -14,9 +14,9 @@ import retrofit.http.GET;
 public interface LocationService {
 
         @GET("/bikes")
-        void listBikes(Callback<List<Bike>> cb);
+        Call<List<Bike>> listBikes();
         @GET("/docks")
-        void listDocks(Callback<List<Dock>> cb);
+        Call<List<Dock>> listDocks();
 
 
 
