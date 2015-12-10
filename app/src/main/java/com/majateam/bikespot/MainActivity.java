@@ -235,31 +235,12 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
     }
 
-    //Direction server key AIzaSyDNtlRTiYN4cNhjmO3Zzzghg0I7mV5i9bc
-
     @OnClick(R.id.map_user_location)
     public void showUserLocation() {
         GoogleMap map = getMap();
         if(map != null) {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));
         }
-        /*String serverKey = "AIzaSyDNtlRTiYN4cNhjmO3Zzzghg0I7mV5i9bc";
-        LatLng origin = new LatLng(37.7849569, -122.4068855);
-        LatLng destination = new LatLng(37.7814432, -122.4460177);
-        GoogleDirection.withServerKey(serverKey)
-                .from(origin)
-                .to(destination)
-                .execute(new DirectionCallback() {
-                    @Override
-                    public void onDirectionSuccess(Direction direction) {
-                        // Do something here
-                    }
-
-                    @Override
-                    public void onDirectionFailure(Throwable t) {
-                        // Do something here
-                    }
-                });*/
     }
 
 
