@@ -14,6 +14,7 @@ import com.akexorcist.googledirection.GoogleDirection;
 import com.akexorcist.googledirection.constant.TransportMode;
 import com.akexorcist.googledirection.constant.Unit;
 import com.akexorcist.googledirection.model.Direction;
+import com.akexorcist.googledirection.model.Info;
 import com.akexorcist.googledirection.model.Step;
 import com.akexorcist.googledirection.util.DirectionConverter;
 import com.crashlytics.android.Crashlytics;
@@ -119,6 +120,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     public void showChoice() {
         updateChoice();
         showPopup();
+        removeDestination();
     }
 
     private void updateChoice(){
@@ -163,16 +165,18 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        LatLng destPosition = marker.getPosition();
-        drawDestination(destPosition);
+        if(mChoice == DOCKS) {
+            LatLng destPosition = marker.getPosition();
+            drawDestination(destPosition, marker);
+        }
         return false;
     }
 
-    private void drawDestination(LatLng destination){
+    private void drawDestination(LatLng destination, final Marker marker){
         //if it already exists a polyline we remove it
-        if(mPolylines.size() > 0) {
-            removeDestination();
-        }
+
+        removeDestination();
+
         //Then we draw the new polyline and display it
 
         String serverKey = "AIzaSyDNtlRTiYN4cNhjmO3Zzzghg0I7mV5i9bc";
@@ -188,9 +192,12 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                     public void onDirectionSuccess(Direction direction) {
                         // Do something here
                         //String status = direction.getStatus();
+                        Info durationInfo = direction.getRouteList().get(0).getLegList().get(0).getDuration();
+                        marker.setTitle(durationInfo.getText());
+                        marker.showInfoWindow();
                         if (direction.isOK()) {
                             List<Step> stepList = direction.getRouteList().get(0).getLegList().get(0).getStepList();
-                            ArrayList<PolylineOptions> polylineOptionList = DirectionConverter.createTransitPolyline(MainActivity.this, stepList, 5, Color.RED, 3, Color.BLUE);
+                            ArrayList<PolylineOptions> polylineOptionList = DirectionConverter.createTransitPolyline(MainActivity.this, stepList, 5, Color.BLACK, 3, Color.BLUE);
                             GoogleMap map = getMap();
                             LatLngBounds.Builder builder = new LatLngBounds.Builder();
                             for (PolylineOptions polylineOption : polylineOptionList) {
@@ -207,7 +214,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                             VisibleRegion visibleRegion = map.getProjection().getVisibleRegion();
                             LatLngBounds mapLatLngBound = visibleRegion.latLngBounds;
 
-                            map.moveCamera(CameraUpdateFactory.newLatLng(mapLatLngBound.getCenter()));
+                            map.animateCamera(CameraUpdateFactory.newLatLng(mapLatLngBound.getCenter()));
                         }
                         Log.v(TAG, "direction is ok : " + direction.isOK());
                     }
@@ -220,11 +227,12 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     }
 
     private void removeDestination(){
-        for(Polyline line : mPolylines)
-        {
-            line.remove();
+        if(mPolylines.size() > 0) {
+            for (Polyline line : mPolylines) {
+                line.remove();
+            }
+            mPolylines.clear();
         }
-        mPolylines.clear();
     }
 
     @Override
