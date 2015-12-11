@@ -4,11 +4,9 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.akexorcist.googledirection.DirectionCallback;
@@ -28,9 +26,9 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.MarkerManager;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
-import com.majateam.bikespot.helper.BikeLocationDbHelper;
 import com.majateam.bikespot.model.Bike;
 import com.majateam.bikespot.model.Dock;
 import com.majateam.bikespot.provider.LocationProvider;
@@ -54,16 +52,15 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private LocationProvider mLocationProvider;
-    private BikeLocationDbHelper mDbHelper;
+    //private BikeLocationDbHelper mDbHelper;
     private List<Bike> bikes;
     private List<Dock> docks;
     private ClusterManager<ClusterItem> mClusterManager;
+    private MarkerManager mMarkerManager;
     private static final int BIKES = 10;
     private static final int DOCKS = 20;
     private static final String CHOICE = "choice";
     private static final String MENU_VISIBILITY = "menu_visibility";
-    private LayoutInflater mInflater;
-    private PopupWindow mDropdown = null;
     private int mChoice;
     private double mCurrentLatitude;
     private double mCurrentLongitude;
@@ -168,12 +165,13 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
     @Override
     protected void startDemo() {
-
+        GoogleMap map = getMap();
         mLocationProvider = new LocationProvider(this, this);
         mClusterManager = new ClusterManager<>(this, getMap());
         mClusterManager.setRenderer(new BikeRenderer(getApplicationContext(), getMap(), mClusterManager));
-        getMap().setOnCameraChangeListener(mClusterManager);
-
+        mMarkerManager = new MarkerManager(map);
+        map.setOnCameraChangeListener(mClusterManager);
+        map.setOnMarkerClickListener(mMarkerManager);
         /*mCurrentLatitude = 45.5486;
         mCurrentLongitude = -73.5788;
         GoogleMap map = getMap();
