@@ -25,8 +25,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.android.MarkerManager;
+import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.majateam.bikespot.model.Bike;
@@ -48,15 +49,13 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-public class MainActivity extends BaseActivity implements LocationProvider.LocationCallback {
+public class MainActivity extends BaseActivity implements LocationProvider.LocationCallback, GoogleMap.OnMarkerClickListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private LocationProvider mLocationProvider;
-    //private BikeLocationDbHelper mDbHelper;
     private List<Bike> bikes;
     private List<Dock> docks;
     private ClusterManager<ClusterItem> mClusterManager;
-    private MarkerManager mMarkerManager;
     private static final int BIKES = 10;
     private static final int DOCKS = 20;
     private static final String CHOICE = "choice";
@@ -64,6 +63,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     private int mChoice;
     private double mCurrentLatitude;
     private double mCurrentLongitude;
+    private List<Polyline> mPolylines;
 
     private Marker mUserMarker = null;
     @Bind(R.id.sub_menu)
@@ -83,11 +83,6 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
         Fabric.with(this, new Crashlytics());
-        /*Toolbar toolbar = (Toolbar) findViewById(com.majateam.bikespot.R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null)
-            getSupportActionBar().setDisplayShowTitleEnabled(false);*/
-
         //set default choice
 
         if(savedInstanceState != null) {
@@ -101,6 +96,9 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             mChoiceIcon.setImageResource(R.drawable.ic_legend_stolen);
             mShowIcon.setImageResource(R.drawable.ic_legend_dock);
         }
+
+        //init polylines array
+        mPolylines = new ArrayList<>();
 
     }
 
@@ -164,22 +162,83 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     }
 
     @Override
+    public boolean onMarkerClick(Marker marker) {
+        LatLng destPosition = marker.getPosition();
+        drawDestination(destPosition);
+        return false;
+    }
+
+    private void drawDestination(LatLng destination){
+        //if it already exists a polyline we remove it
+        if(mPolylines.size() > 0) {
+            removeDestination();
+        }
+        //Then we draw the new polyline and display it
+
+        String serverKey = "AIzaSyDNtlRTiYN4cNhjmO3Zzzghg0I7mV5i9bc";
+        LatLng origin = new LatLng(mCurrentLatitude, mCurrentLongitude);
+
+        GoogleDirection.withServerKey(serverKey)
+                .from(origin)
+                .to(destination)
+                .transportMode(TransportMode.BICYCLING)
+                .unit(Unit.METRIC)
+                .execute(new DirectionCallback() {
+                    @Override
+                    public void onDirectionSuccess(Direction direction) {
+                        // Do something here
+                        //String status = direction.getStatus();
+                        if (direction.isOK()) {
+                            List<Step> stepList = direction.getRouteList().get(0).getLegList().get(0).getStepList();
+                            ArrayList<PolylineOptions> polylineOptionList = DirectionConverter.createTransitPolyline(MainActivity.this, stepList, 5, Color.RED, 3, Color.BLUE);
+                            GoogleMap map = getMap();
+                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                            for (PolylineOptions polylineOption : polylineOptionList) {
+                                mPolylines.add(map.addPolyline(polylineOption));
+                                for (LatLng latLng : polylineOption.getPoints()) {
+                                    builder.include(latLng);
+                                }
+                            }
+                            LatLngBounds bounds = builder.build();
+                            int padding = 0; // offset from edges of the map in pixels
+                            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+                            map.animateCamera(cu);
+                            VisibleRegion visibleRegion = map.getProjection().getVisibleRegion();
+                            LatLngBounds mapLatLngBound = visibleRegion.latLngBounds;
+
+                            map.moveCamera(CameraUpdateFactory.newLatLng(mapLatLngBound.getCenter()));
+                        }
+                        Log.v(TAG, "direction is ok : " + direction.isOK());
+                    }
+
+                    @Override
+                    public void onDirectionFailure(Throwable t) {
+                        // Do something here
+                    }
+                });
+    }
+
+    private void removeDestination(){
+        for(Polyline line : mPolylines)
+        {
+            line.remove();
+        }
+        mPolylines.clear();
+    }
+
+    @Override
     protected void startDemo() {
         GoogleMap map = getMap();
         mLocationProvider = new LocationProvider(this, this);
         mClusterManager = new ClusterManager<>(this, getMap());
         mClusterManager.setRenderer(new BikeRenderer(getApplicationContext(), getMap(), mClusterManager));
-        mMarkerManager = new MarkerManager(map);
         map.setOnCameraChangeListener(mClusterManager);
-        map.setOnMarkerClickListener(mMarkerManager);
-        /*mCurrentLatitude = 45.5486;
-        mCurrentLongitude = -73.5788;
-        GoogleMap map = getMap();
-        LatLng latLng = new LatLng(mCurrentLatitude, mCurrentLongitude);
-        MarkerOptions options = new MarkerOptions().position(latLng)
-                .icon(BitmapDescriptorFactory.fromResource(com.majateam.bikespot.R.drawable.ic_user_location));
-        mUserMarker = map.addMarker(options);
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));*/
+        map.setOnMarkerClickListener(this);
+
+        //commented code used with Android emulator, uncomment to use it
+        //setFalseUserLocation();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Global.ENDPOINT)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -218,6 +277,20 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
     }
 
+    /**
+     * False user location used only for android emulator
+     */
+    private void setFalseUserLocation(){
+        mCurrentLatitude = 45.5486;
+        mCurrentLongitude = -73.5788;
+        GoogleMap map = getMap();
+        LatLng latLng = new LatLng(mCurrentLatitude, mCurrentLongitude);
+        MarkerOptions options = new MarkerOptions().position(latLng)
+                .icon(BitmapDescriptorFactory.fromResource(com.majateam.bikespot.R.drawable.ic_user_location));
+        mUserMarker = map.addMarker(options);
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));
+    }
+
     private void setClusterItems(int type) {
         mClusterManager.clearItems();
         if (type == BIKES && bikes != null) {
@@ -250,60 +323,13 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
 
     }
-    //Direction server key AIzaSyDNtlRTiYN4cNhjmO3Zzzghg0I7mV5i9bc
 
     @OnClick(R.id.map_user_location)
     public void showUserLocation() {
-        //GoogleMap map = getMap();
-        /*if(map != null) {
+        GoogleMap map = getMap();
+        if(map != null) {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));
-        }*/
-        String serverKey = "AIzaSyDNtlRTiYN4cNhjmO3Zzzghg0I7mV5i9bc";
-        LatLng origin = new LatLng(45.5486, -73.5788);
-        LatLng destination = new LatLng(45.5231079, -73.589279);
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
-
-        GoogleDirection.withServerKey(serverKey)
-                .from(origin)
-                .to(destination)
-                .transportMode(TransportMode.BICYCLING)
-                .unit(Unit.METRIC)
-                .execute(new DirectionCallback() {
-                    @Override
-                    public void onDirectionSuccess(Direction direction) {
-                        // Do something here
-                        //String status = direction.getStatus();
-                        if(direction.isOK()){
-                            List<Step> stepList = direction.getRouteList().get(0).getLegList().get(0).getStepList();
-                            ArrayList<PolylineOptions> polylineOptionList = DirectionConverter.createTransitPolyline(MainActivity.this, stepList, 5, Color.RED, 3, Color.BLUE);
-                            GoogleMap map = getMap();
-
-                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                            for (PolylineOptions polylineOption : polylineOptionList) {
-                                map.addPolyline(polylineOption);
-                                for(LatLng latLng : polylineOption.getPoints()){
-                                    builder.include(latLng);
-                                }
-                            }
-                            //builder.include(origin);
-                            //builder.include(destination);
-                            LatLngBounds bounds = builder.build();
-                            int padding = 100; // offset from edges of the map in pixels
-                            final CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-
-                            map.animateCamera(cu);
-                            //map.animateCamera( CameraUpdateFactory.zoomTo( 14.0f ) );
-                        }
-                        Log.v(TAG, "direction is ok : " + direction.isOK());
-                    }
-
-                    @Override
-                    public void onDirectionFailure(Throwable t) {
-                        // Do something here
-                    }
-                });
-
+        }
     }
 
 
