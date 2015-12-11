@@ -1,7 +1,9 @@
 package com.majateam.bikespot;
 
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -11,14 +13,21 @@ import android.widget.TextView;
 
 import com.akexorcist.googledirection.DirectionCallback;
 import com.akexorcist.googledirection.GoogleDirection;
+import com.akexorcist.googledirection.constant.TransportMode;
+import com.akexorcist.googledirection.constant.Unit;
 import com.akexorcist.googledirection.model.Direction;
+import com.akexorcist.googledirection.model.Step;
+import com.akexorcist.googledirection.util.DirectionConverter;
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.majateam.bikespot.helper.BikeLocationDbHelper;
@@ -165,6 +174,14 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         mClusterManager.setRenderer(new BikeRenderer(getApplicationContext(), getMap(), mClusterManager));
         getMap().setOnCameraChangeListener(mClusterManager);
 
+        mCurrentLatitude = 45.5486;
+        mCurrentLongitude = -73.5788;
+        GoogleMap map = getMap();
+        LatLng latLng = new LatLng(mCurrentLatitude, mCurrentLongitude);
+        MarkerOptions options = new MarkerOptions().position(latLng)
+                .icon(BitmapDescriptorFactory.fromResource(com.majateam.bikespot.R.drawable.ic_user_location));
+        mUserMarker = map.addMarker(options);
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Global.ENDPOINT)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -239,20 +256,41 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
     @OnClick(R.id.map_user_location)
     public void showUserLocation() {
-        /*GoogleMap map = getMap();
-        if(map != null) {
+        //GoogleMap map = getMap();
+        /*if(map != null) {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));
         }*/
         String serverKey = "AIzaSyDNtlRTiYN4cNhjmO3Zzzghg0I7mV5i9bc";
-        LatLng origin = new LatLng(37.7849569, -122.4068855);
-        LatLng destination = new LatLng(37.7814432, -122.4460177);
+        LatLng origin = new LatLng(45.5486, -73.5788);
+        LatLng destination = new LatLng(45.5231079, -73.589279);
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        //for (Marker marker : markers) {
+        builder.include(origin);
+        builder.include(destination);
+        //}
+        LatLngBounds bounds = builder.build();
+        int padding = 30; // offset from edges of the map in pixels
+        final CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
         GoogleDirection.withServerKey(serverKey)
                 .from(origin)
                 .to(destination)
+                .transportMode(TransportMode.BICYCLING)
+                .unit(Unit.METRIC)
                 .execute(new DirectionCallback() {
                     @Override
                     public void onDirectionSuccess(Direction direction) {
                         // Do something here
+                        //String status = direction.getStatus();
+                        if(direction.isOK()){
+                            List<Step> stepList = direction.getRouteList().get(0).getLegList().get(0).getStepList();
+                            ArrayList<PolylineOptions> polylineOptionList = DirectionConverter.createTransitPolyline(MainActivity.this, stepList, 5, Color.RED, 3, Color.BLUE);
+                            GoogleMap map = getMap();
+                            for (PolylineOptions polylineOption : polylineOptionList) {
+                                map.addPolyline(polylineOption);
+                            }
+                            map.animateCamera(cu);
+                        }
+                        Log.v(TAG, "direction is ok : " + direction.isOK());
                     }
 
                     @Override
