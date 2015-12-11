@@ -1,4 +1,4 @@
-# stolen-bike-android
+# Bike Spot
 
 #v1.0.2
 - 'Locate me' button added
