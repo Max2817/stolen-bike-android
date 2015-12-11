@@ -1,5 +1,8 @@
 # Bike Spot
 
+#v1.0.3
+- Added direction and time when you click on a dock marker
+
 #v1.0.2
 - 'Locate me' button added
 
