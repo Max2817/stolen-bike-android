@@ -1,7 +1,9 @@
 package com.majateam.bikespot;
 
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -9,13 +11,23 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.akexorcist.googledirection.DirectionCallback;
+import com.akexorcist.googledirection.GoogleDirection;
+import com.akexorcist.googledirection.constant.TransportMode;
+import com.akexorcist.googledirection.constant.Unit;
+import com.akexorcist.googledirection.model.Direction;
+import com.akexorcist.googledirection.model.Step;
+import com.akexorcist.googledirection.util.DirectionConverter;
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.majateam.bikespot.helper.BikeLocationDbHelper;
@@ -32,10 +44,11 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.fabric.sdk.android.Fabric;
+import retrofit.Call;
 import retrofit.Callback;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit.GsonConverterFactory;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 public class MainActivity extends BaseActivity implements LocationProvider.LocationCallback {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -155,51 +168,56 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
     @Override
     protected void startDemo() {
+
         mLocationProvider = new LocationProvider(this, this);
         mClusterManager = new ClusterManager<>(this, getMap());
         mClusterManager.setRenderer(new BikeRenderer(getApplicationContext(), getMap(), mClusterManager));
         getMap().setOnCameraChangeListener(mClusterManager);
 
-        //Call the bikes
-        LocationService locationService = new RestAdapter.Builder()
-                .setEndpoint(Global.ENDPOINT)
-                .build()
-                .create(LocationService.class);
-        mDbHelper = new BikeLocationDbHelper(this);
+        /*mCurrentLatitude = 45.5486;
+        mCurrentLongitude = -73.5788;
+        GoogleMap map = getMap();
+        LatLng latLng = new LatLng(mCurrentLatitude, mCurrentLongitude);
+        MarkerOptions options = new MarkerOptions().position(latLng)
+                .icon(BitmapDescriptorFactory.fromResource(com.majateam.bikespot.R.drawable.ic_user_location));
+        mUserMarker = map.addMarker(options);
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));*/
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Global.ENDPOINT)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        final LocationService service = retrofit.create(LocationService.class);
 
-        locationService.listBikes(new Callback<List<Bike>>() {
+        Call<List<Bike>> callBikes = service.listBikes();
+        callBikes.enqueue(new Callback<List<Bike>>() {
+
             @Override
-            public void success(List<Bike> returnedBikes, Response response) {
-                // Gets the data repository in write mode
-                //SQLiteDatabase db = mDbHelper.getWritableDatabase();
-                //mDbHelper.onInsertList(db, returnedBikes);
-                bikes = returnedBikes;
+            public void onResponse(Response<List<Bike>> response, Retrofit retrofit) {
 
+                bikes = response.body();
 
-                LocationService locationService = new RestAdapter.Builder()
-                        .setEndpoint(Global.ENDPOINT)
-                        .build()
-                        .create(LocationService.class);
-                locationService.listDocks(new Callback<List<Dock>>() {
+                Call<List<Dock>> callDocks = service.listDocks();
+                callDocks.enqueue(new Callback<List<Dock>>() {
+
                     @Override
-                    public void success(List<Dock> returnedDocks, Response response) {
-                        docks = returnedDocks;
+                    public void onResponse(Response<List<Dock>> response, Retrofit retrofit) {
+                        docks = response.body();
                         setClusterItems(mChoice);
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
+                    public void onFailure(Throwable t) {
                         // you should handle errors, too
                     }
                 });
-
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Throwable t) {
                 // you should handle errors, too
             }
         });
+
     }
 
     private void setClusterItems(int type) {
@@ -234,13 +252,60 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
 
     }
+    //Direction server key AIzaSyDNtlRTiYN4cNhjmO3Zzzghg0I7mV5i9bc
 
     @OnClick(R.id.map_user_location)
     public void showUserLocation() {
-        GoogleMap map = getMap();
-        if(map != null) {
+        //GoogleMap map = getMap();
+        /*if(map != null) {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));
-        }
+        }*/
+        String serverKey = "AIzaSyDNtlRTiYN4cNhjmO3Zzzghg0I7mV5i9bc";
+        LatLng origin = new LatLng(45.5486, -73.5788);
+        LatLng destination = new LatLng(45.5231079, -73.589279);
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+
+        GoogleDirection.withServerKey(serverKey)
+                .from(origin)
+                .to(destination)
+                .transportMode(TransportMode.BICYCLING)
+                .unit(Unit.METRIC)
+                .execute(new DirectionCallback() {
+                    @Override
+                    public void onDirectionSuccess(Direction direction) {
+                        // Do something here
+                        //String status = direction.getStatus();
+                        if(direction.isOK()){
+                            List<Step> stepList = direction.getRouteList().get(0).getLegList().get(0).getStepList();
+                            ArrayList<PolylineOptions> polylineOptionList = DirectionConverter.createTransitPolyline(MainActivity.this, stepList, 5, Color.RED, 3, Color.BLUE);
+                            GoogleMap map = getMap();
+
+                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                            for (PolylineOptions polylineOption : polylineOptionList) {
+                                map.addPolyline(polylineOption);
+                                for(LatLng latLng : polylineOption.getPoints()){
+                                    builder.include(latLng);
+                                }
+                            }
+                            //builder.include(origin);
+                            //builder.include(destination);
+                            LatLngBounds bounds = builder.build();
+                            int padding = 100; // offset from edges of the map in pixels
+                            final CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+                            map.animateCamera(cu);
+                            //map.animateCamera( CameraUpdateFactory.zoomTo( 14.0f ) );
+                        }
+                        Log.v(TAG, "direction is ok : " + direction.isOK());
+                    }
+
+                    @Override
+                    public void onDirectionFailure(Throwable t) {
+                        // Do something here
+                    }
+                });
+
     }
 
 
