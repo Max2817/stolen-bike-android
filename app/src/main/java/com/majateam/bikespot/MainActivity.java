@@ -174,14 +174,14 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         mClusterManager.setRenderer(new BikeRenderer(getApplicationContext(), getMap(), mClusterManager));
         getMap().setOnCameraChangeListener(mClusterManager);
 
-        mCurrentLatitude = 45.5486;
+        /*mCurrentLatitude = 45.5486;
         mCurrentLongitude = -73.5788;
         GoogleMap map = getMap();
         LatLng latLng = new LatLng(mCurrentLatitude, mCurrentLongitude);
         MarkerOptions options = new MarkerOptions().position(latLng)
                 .icon(BitmapDescriptorFactory.fromResource(com.majateam.bikespot.R.drawable.ic_user_location));
         mUserMarker = map.addMarker(options);
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));*/
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Global.ENDPOINT)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -264,13 +264,8 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         LatLng origin = new LatLng(45.5486, -73.5788);
         LatLng destination = new LatLng(45.5231079, -73.589279);
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        //for (Marker marker : markers) {
-        builder.include(origin);
-        builder.include(destination);
-        //}
-        LatLngBounds bounds = builder.build();
-        int padding = 30; // offset from edges of the map in pixels
-        final CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+
         GoogleDirection.withServerKey(serverKey)
                 .from(origin)
                 .to(destination)
@@ -285,10 +280,22 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                             List<Step> stepList = direction.getRouteList().get(0).getLegList().get(0).getStepList();
                             ArrayList<PolylineOptions> polylineOptionList = DirectionConverter.createTransitPolyline(MainActivity.this, stepList, 5, Color.RED, 3, Color.BLUE);
                             GoogleMap map = getMap();
+
+                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
                             for (PolylineOptions polylineOption : polylineOptionList) {
                                 map.addPolyline(polylineOption);
+                                for(LatLng latLng : polylineOption.getPoints()){
+                                    builder.include(latLng);
+                                }
                             }
+                            //builder.include(origin);
+                            //builder.include(destination);
+                            LatLngBounds bounds = builder.build();
+                            int padding = 100; // offset from edges of the map in pixels
+                            final CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
                             map.animateCamera(cu);
+                            //map.animateCamera( CameraUpdateFactory.zoomTo( 14.0f ) );
                         }
                         Log.v(TAG, "direction is ok : " + direction.isOK());
                     }
