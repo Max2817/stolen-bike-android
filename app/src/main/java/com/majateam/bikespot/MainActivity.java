@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
+import com.majateam.bikespot.helper.MapHelper;
 import com.majateam.bikespot.model.Bike;
 import com.majateam.bikespot.model.Dock;
 import com.majateam.bikespot.provider.LocationProvider;
@@ -329,8 +330,20 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             mUserMarker.setPosition(latLng);
         }
 
+        //check if there is any recent stolen bike (< 6 months) around me 300m
+        if(mChoice == BIKES){
+            if(bikes.size() > 0) {
+                for (Bike bike : bikes) {
+                    if (MapHelper.distFrom((float) mCurrentLatitude, (float) mCurrentLongitude, Float.valueOf(bike.getLat()), Float.valueOf(bike.getLng())) <= 300) {
+                        Log.v(TAG, "DANGER");
+                        break;
+                    }
+                }
+            }
+        }
 
     }
+
 
     @OnClick(R.id.map_user_location)
     public void showUserLocation() {
