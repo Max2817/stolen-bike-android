@@ -1,122 +1,150 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MainActivity" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
 
-        <!-- A CardView that contains a TextView -->
-        <android.support.v7.widget.CardView
-            android:id="@+id/card_view"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
-            card_view:cardBackgroundColor="@color/green">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical">
-                <ImageView
-                    android:id="@+id/choice_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/choice_icon"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginStart="8dp"/>
-                <TextView
-                    android:id="@+id/display_choice"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:textColor="@android:color/black"
-                    android:textAllCaps="true"/>
-
-                <ImageView
-                    android:id="@+id/menu_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/menu_icon"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
-                    android:src="@drawable/ic_more_vert_white_24dp"/>
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
-
-        <LinearLayout
-            android:id="@+id/sub_menu"
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:visibility="gone">
+            tools:context=".MainActivity" />
 
-            <View android:layout_height="1dp"
-                android:layout_width="match_parent"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:background="@android:color/white"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
+            <!-- A CardView that contains a TextView -->
             <android.support.v7.widget.CardView
-                android:id="@+id/show_choice"
+                android:id="@+id/card_view"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                card_view:cardBackgroundColor="@color/light_green">
+                android:layout_marginTop="8dp"
+                card_view:cardBackgroundColor="@color/green">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical">
+
                     <ImageView
-                        android:id="@+id/show_icon"
+                        android:id="@+id/choice_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:contentDescription="@string/choice_icon"
                         android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"/>
+                        android:layout_marginStart="8dp"
+                        android:contentDescription="@string/choice_icon" />
 
-                    <TextView android:id="@+id/show_choice_txt"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                    <TextView
+                        android:id="@+id/display_choice"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginLeft="12dp"
                         android:layout_marginStart="12dp"
-                        android:gravity="center_vertical"
-                        android:text="@string/show_bikes"
-                        android:textColor="@android:color/black"
-                        android:textAllCaps="true"/>
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:textAllCaps="true"
+                        android:textColor="@android:color/black" />
 
+                    <ImageView
+                        android:id="@+id/menu_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/menu_icon"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp"
+                        android:src="@drawable/ic_more_vert_white_24dp" />
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 
+            <LinearLayout
+                android:id="@+id/sub_menu"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:background="@android:color/white" />
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/show_choice"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    card_view:cardBackgroundColor="@color/light_green">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:id="@+id/show_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginStart="8dp"
+                            android:contentDescription="@string/choice_icon" />
+
+                        <TextView
+                            android:id="@+id/show_choice_txt"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="12dp"
+                            android:layout_marginStart="12dp"
+                            android:gravity="center_vertical"
+                            android:text="@string/show_bikes"
+                            android:textAllCaps="true"
+                            android:textColor="@android:color/black" />
+
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+
+            </LinearLayout>
         </LinearLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/map_user_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_marginBottom="64dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/ic_my_location_black_24dp" />
+
+    </FrameLayout>
+
+    <LinearLayout android:id="@+id/bike_spot_info_layout"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:background="@color/green">
+
+        <TextView android:id="@+id/bike_spot_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bike_neutral_spot"
+            android:textAllCaps="true"
+            android:textColor="@android:color/black"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"/>
     </LinearLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/map_user_location"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:src="@drawable/ic_my_location_black_24dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="64dp"/>
-
-</FrameLayout>
+</LinearLayout>

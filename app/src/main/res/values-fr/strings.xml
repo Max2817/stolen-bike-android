@@ -10,4 +10,6 @@
     <string name="stolen_on">Volé le</string>
     <string name="choice_icon">icone de choix</string>
     <string name="menu_icon">icone de menu</string>
+    <string name="bike_unsafe_spot">Zone non sécuritaire</string>
+    <string name="bike_neutral_spot">Zone neutre</string>
 </resources>

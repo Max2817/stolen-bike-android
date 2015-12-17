@@ -54,6 +54,10 @@ public class Bike implements ClusterItem {
         return DateFormat.format(format, cal).toString();
     }
 
+    public long getRawDate() {
+        return date;
+    }
+
     public void setDate(long date) {
         this.date = date;
     }

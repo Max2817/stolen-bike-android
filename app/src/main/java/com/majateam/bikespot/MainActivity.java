@@ -66,6 +66,10 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     private double mCurrentLatitude;
     private double mCurrentLongitude;
     private List<Polyline> mPolylines;
+    private static final int UNSAFE_SPOT = 30;
+    private static final int NEUTRAL_SPOT = 40;
+    private static final String SPOT = "spot";
+    private int mSpot = NEUTRAL_SPOT;
 
     private Marker mUserMarker = null;
     @Bind(R.id.sub_menu)
@@ -78,6 +82,10 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     ImageView mChoiceIcon;
     @Bind(R.id.show_icon)
     ImageView mShowIcon;
+    @Bind(R.id.bike_spot_info_layout)
+    LinearLayout mBikeSpotLayout;
+    @Bind(R.id.bike_spot_status)
+    TextView mBikeSpotStatus;
 
 
     @Override
@@ -91,6 +99,8 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             mChoice = savedInstanceState.getInt(CHOICE);
             mSubMenu.setVisibility((savedInstanceState.getInt(MENU_VISIBILITY) == View.VISIBLE) ? View.VISIBLE : View.GONE);
             setChoice();
+            mSpot = savedInstanceState.getInt(SPOT);
+            setSpotStatus();
         }else{
             mChoice = BIKES;
             mShowChoice.setText(com.majateam.bikespot.R.string.show_docks);
@@ -154,6 +164,17 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             mDisplayChoice.setText(com.majateam.bikespot.R.string.docks);
             mChoiceIcon.setImageResource(R.drawable.ic_legend_dock);
             mShowIcon.setImageResource(R.drawable.ic_legend_stolen);
+        }
+        setClusterItems(mChoice);
+    }
+
+    private void setSpotStatus(){
+        if(mSpot == UNSAFE_SPOT){
+            mBikeSpotLayout.setBackgroundResource(R.color.red);
+            mBikeSpotStatus.setText(R.string.bike_unsafe_spot);
+        }else{
+            mBikeSpotLayout.setBackgroundResource(R.color.green);
+            mBikeSpotStatus.setText(R.string.bike_neutral_spot);
         }
         setClusterItems(mChoice);
     }
@@ -333,12 +354,14 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         //check if there is any recent stolen bike (< 6 months) around me 300m
         if(mChoice == BIKES){
             if(bikes != null && bikes.size() > 0) {
+                mSpot = NEUTRAL_SPOT;
                 for (Bike bike : bikes) {
                     if (MapHelper.distFrom((float) mCurrentLatitude, (float) mCurrentLongitude, Float.valueOf(bike.getLat()), Float.valueOf(bike.getLng())) <= 300) {
-                        Log.v(TAG, "DANGER");
+                        mSpot = UNSAFE_SPOT;
                         break;
                     }
                 }
+                setSpotStatus();
             }
         }
 

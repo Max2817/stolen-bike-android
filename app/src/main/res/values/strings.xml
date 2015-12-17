@@ -9,4 +9,6 @@
     <string name="stolen_on">Stolen on</string>
     <string name="choice_icon">choice icon</string>
     <string name="menu_icon">menu icon</string>
+    <string name="bike_unsafe_spot">Bike Unsafe Spot</string>
+    <string name="bike_neutral_spot">Bike neutral Spot</string>
 </resources>
