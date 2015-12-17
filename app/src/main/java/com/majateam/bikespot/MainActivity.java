@@ -332,7 +332,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
         //check if there is any recent stolen bike (< 6 months) around me 300m
         if(mChoice == BIKES){
-            if(bikes.size() > 0) {
+            if(bikes != null && bikes.size() > 0) {
                 for (Bike bike : bikes) {
                     if (MapHelper.distFrom((float) mCurrentLatitude, (float) mCurrentLongitude, Float.valueOf(bike.getLat()), Float.valueOf(bike.getLng())) <= 300) {
                         Log.v(TAG, "DANGER");
