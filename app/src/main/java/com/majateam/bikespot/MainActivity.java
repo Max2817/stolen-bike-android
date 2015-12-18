@@ -3,6 +3,7 @@ package com.majateam.bikespot;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -22,6 +23,8 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -65,13 +68,17 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     private int mChoice;
     private double mCurrentLatitude;
     private double mCurrentLongitude;
+    private static final String CURRENT_LATITUDE = "currentLatitude";
+    private static final String CURRENT_LONGITUDE = "currentLongitude";
     private List<Polyline> mPolylines;
     private static final int UNSAFE_SPOT = 30;
     private static final int NEUTRAL_SPOT = 40;
     private static final String SPOT = "spot";
     private int mSpot = NEUTRAL_SPOT;
-
     private Marker mUserMarker = null;
+    private Circle mCircle = null;
+    private static final int NEUTRAL_DISTANCE = 300;
+
     @Bind(R.id.sub_menu)
     LinearLayout mSubMenu;
     @Bind(R.id.display_choice)
@@ -96,6 +103,8 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         //set default choice
 
         if(savedInstanceState != null) {
+            mCurrentLatitude = savedInstanceState.getDouble(CURRENT_LATITUDE);
+            mCurrentLongitude = savedInstanceState.getDouble(CURRENT_LONGITUDE);
             mChoice = savedInstanceState.getInt(CHOICE);
             mSubMenu.setVisibility((savedInstanceState.getInt(MENU_VISIBILITY) == View.VISIBLE) ? View.VISIBLE : View.GONE);
             setChoice();
@@ -119,6 +128,9 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         super.onSaveInstanceState(outState);
         outState.putInt(CHOICE, mChoice);
         outState.putInt(MENU_VISIBILITY, mSubMenu.getVisibility());
+        outState.putInt(SPOT, mSpot);
+        outState.putDouble(CURRENT_LATITUDE, mCurrentLatitude);
+        outState.putDouble(CURRENT_LONGITUDE, mCurrentLongitude);
     }
 
 
@@ -172,6 +184,18 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         if(mSpot == UNSAFE_SPOT){
             mBikeSpotLayout.setBackgroundResource(R.color.red);
             mBikeSpotStatus.setText(R.string.bike_unsafe_spot);
+            // Instantiates a new CircleOptions object and defines the center and radius
+            CircleOptions circleOptions = new CircleOptions()
+                    .center(new LatLng(mCurrentLatitude, mCurrentLongitude))
+                    .radius(NEUTRAL_DISTANCE)
+                    .strokeColor(ContextCompat.getColor(this, R.color.red))
+                    .fillColor(ContextCompat.getColor(this, R.color.red_transparent)); // In meters
+
+            // Get back the mutable Circle
+            if(mCircle != null){
+                mCircle.remove();
+            }
+            mCircle = getMap().addCircle(circleOptions);
         }else{
             mBikeSpotLayout.setBackgroundResource(R.color.green);
             mBikeSpotStatus.setText(R.string.bike_neutral_spot);
@@ -355,8 +379,8 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         if(mChoice == BIKES){
             if(bikes != null && bikes.size() > 0) {
                 mSpot = NEUTRAL_SPOT;
-                for (Bike bike : bikes) {
-                    if (MapHelper.distFrom((float) mCurrentLatitude, (float) mCurrentLongitude, Float.valueOf(bike.getLat()), Float.valueOf(bike.getLng())) <= 300) {
+                for (Bike bike :  bikes) {
+                    if (MapHelper.distFrom((float) mCurrentLatitude, (float) mCurrentLongitude, Float.valueOf(bike.getLat()), Float.valueOf(bike.getLng())) <= NEUTRAL_DISTANCE) {
                         mSpot = UNSAFE_SPOT;
                         break;
                     }
