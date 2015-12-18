@@ -1,5 +1,7 @@
 package com.majateam.bikespot.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.format.DateFormat;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -11,7 +13,7 @@ import java.util.Locale;
 /**
  * Created by Nicolas Martino on 08/06/15.
  */
-public class Bike implements ClusterItem {
+public class Bike implements ClusterItem, Parcelable {
 
     private String id;
     private String lat;
@@ -73,4 +75,34 @@ public class Bike implements ClusterItem {
         return new LatLng(Double.valueOf(lat), Double.valueOf(lng));
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(lat);
+        dest.writeString(lng);
+        dest.writeLong(date);
+    }
+
+    public static final Parcelable.Creator<Bike> CREATOR = new Creator<Bike>() {
+
+        public Bike createFromParcel(Parcel source) {
+
+            Bike bike = new Bike();
+            bike.id = source.readString();
+            bike.lat = source.readString();
+            bike.lng = source.readString();
+            bike.date = source.readLong();
+            return bike;
+        }
+
+        @Override
+        public Bike[] newArray(int size) {
+            return new Bike[size];
+        }
+    };
 }

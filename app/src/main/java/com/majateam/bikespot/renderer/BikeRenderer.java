@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
@@ -38,6 +39,11 @@ public class BikeRenderer extends DefaultClusterRenderer<ClusterItem> {
     @Override
     protected void onBeforeClusterRendered(Cluster<ClusterItem> cluster, MarkerOptions markerOptions) {
         super.onBeforeClusterRendered(cluster, markerOptions);
+    }
+
+    @Override
+    protected void onClusterRendered(Cluster<ClusterItem> cluster, Marker marker) {
+        super.onClusterRendered(cluster, marker);
     }
 
     @Override

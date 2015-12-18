@@ -3,5 +3,8 @@
     <color name="green">#5FDCCA</color>
     <color name="light_green">#9DF1E4</color>
     <color name="red">#CD1212</color>
-    <color name="red_transparent">#CCCD1212</color>
+    <color name="red_transparent">#26CD1212</color>
+    <color name="transparent">#00000000</color>
+    <color name="grey">#E6E6E6</color>
+
 </resources>

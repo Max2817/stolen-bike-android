@@ -80,6 +80,11 @@ public class LocationProvider implements
         }
     }
 
+    public void callNewLocation(){
+        onConnected(null);
+
+    }
+
     @Override
     public void onConnectionSuspended(int i) {
 
