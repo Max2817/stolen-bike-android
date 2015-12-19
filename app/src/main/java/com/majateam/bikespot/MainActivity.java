@@ -219,6 +219,9 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     protected void onResume() {
         super.onResume();
         mLocationProvider.connect();
+        if(mBikes == null || mBikes.size() == 0 || mDocks == null || mDocks.size() == 0){
+            callData();
+        }
     }
 
     @Override
@@ -299,6 +302,11 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
         //commented code used with Android emulator, uncomment to use it
         //setFalseUserLocation();
+        callData();
+
+    }
+
+    private void callData(){
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Global.ENDPOINT)
@@ -324,6 +332,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                         //Update location if we get the data after the location is handled
                         if (mLocationHandledFirst) {
                             mLocationProvider.callNewLocation();
+                            mLocationHandledFirst = false;
                         }
                     }
 
@@ -339,7 +348,6 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                 // you should handle errors, too
             }
         });
-
     }
 
     /**
@@ -413,6 +421,9 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                 }
                 setSpotStatus();
             }else{
+                if(mCircle != null){
+                    mCircle.remove();
+                }
                 mLocationHandledFirst = true;
             }
         }
