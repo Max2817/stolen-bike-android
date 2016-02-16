@@ -218,10 +218,15 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     @Override
     protected void onResume() {
         super.onResume();
-        mLocationProvider.connect();
-        if(mBikes == null || mBikes.size() == 0 || mDocks == null || mDocks.size() == 0){
-            callData();
+        if(mLocationProvider != null) {
+            mLocationProvider.connect();
+            if(mBikes == null || mBikes.size() == 0 || mDocks == null || mDocks.size() == 0){
+                callData();
+            }
+        }else{
+            startDemo();
         }
+
     }
 
     @Override
