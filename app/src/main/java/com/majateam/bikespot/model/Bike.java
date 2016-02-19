@@ -19,6 +19,9 @@ public class Bike implements ClusterItem, Parcelable {
     private String lat;
     private String lng;
     private long date;
+    private String title;
+    private String description;
+    private String brand;
 
     public String getId() {
         return id;
@@ -64,6 +67,31 @@ public class Bike implements ClusterItem, Parcelable {
         this.date = date;
     }
 
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
     // To prevent someone from accidentally instantiating the contract class,
     // give it an empty constructor.
     public Bike() {
@@ -86,6 +114,9 @@ public class Bike implements ClusterItem, Parcelable {
         dest.writeString(lat);
         dest.writeString(lng);
         dest.writeLong(date);
+        dest.writeString(title);
+        dest.writeString(description);
+        dest.writeString(brand);
     }
 
     public static final Parcelable.Creator<Bike> CREATOR = new Creator<Bike>() {
@@ -97,6 +128,9 @@ public class Bike implements ClusterItem, Parcelable {
             bike.lat = source.readString();
             bike.lng = source.readString();
             bike.date = source.readLong();
+            bike.title = source.readString();
+            bike.description = source.readString();
+            bike.brand = source.readString();
             return bike;
         }
 
@@ -105,4 +139,5 @@ public class Bike implements ClusterItem, Parcelable {
             return new Bike[size];
         }
     };
+
 }

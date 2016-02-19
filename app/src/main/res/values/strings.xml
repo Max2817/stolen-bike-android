@@ -12,4 +12,5 @@
     <string name="bike_unsafe_spot">Bike Unsafe Spot (Thefts &lt; 6 months)</string>
     <string name="bike_neutral_spot">Bike neutral Spot</string>
     <string name="loading">Loading…</string>
+    <string name="brand">Brand</string>
 </resources>

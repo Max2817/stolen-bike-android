@@ -7,8 +7,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
         <fragment
             android:id="@+id/map"
@@ -129,21 +128,60 @@
             android:layout_marginRight="8dp"
             android:src="@drawable/ic_my_location_black_24dp" />
 
-    </FrameLayout>
-
-    <LinearLayout android:id="@+id/bike_spot_info_layout"
-        android:layout_width="match_parent"
-        android:layout_height="46dp"
-        android:background="@color/grey">
-
-        <TextView android:id="@+id/bike_spot_status"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/bike_spot_status_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/loading"
-            android:textAllCaps="true"
-            android:textColor="@android:color/black"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"/>
-    </LinearLayout>
+            android:layout_gravity="bottom"
+            android:background="@color/grey"
+            android:minHeight="46dp"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/bike_spot_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:text="@string/loading"
+                android:textAllCaps="true"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:id="@+id/bike_spot_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/bike_spot_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="6dp"
+                android:textColor="@android:color/black"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/bike_spot_brand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="6dp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </LinearLayout>
+    </FrameLayout>
 </LinearLayout>

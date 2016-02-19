@@ -13,4 +13,5 @@
     <string name="bike_unsafe_spot">Zone non sécuritaire (Vols &lt; 6 mois)</string>
     <string name="bike_neutral_spot">Zone neutre</string>
     <string name="loading">Chargement…</string>
+    <string name="brand">Marque</string>
 </resources>
