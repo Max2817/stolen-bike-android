@@ -7,6 +7,7 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.http.GET;
+import retrofit.http.Query;
 import retrofit.http.Url;
 
 /**
@@ -15,7 +16,7 @@ import retrofit.http.Url;
 public interface LocationService {
 
         @GET
-        Call<List<Bike>> listBikes(@Url String url);
+        Call<List<Bike>> listBikes(@Url String url, @Query("added_after") String addedAfter);
         @GET
         Call<List<Dock>> listDocks(@Url String url);
 

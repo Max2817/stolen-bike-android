@@ -13,4 +13,9 @@
     <string name="bike_neutral_spot">Bike neutral Spot</string>
     <string name="loading">Loading…</string>
     <string name="brand">Brand</string>
+    <string name="internet_connected">Internet Connected</string>
+    <string name="lost_internet_connection">Lost Internet Connection</string>
+    <string name="empty_no_internet_connection">No internet</string>
+    <string name="empty_please_connect">Please connect to an Internet network in order to access the data</string>
+    <string name="empty_container">No internet icon</string>
 </resources>

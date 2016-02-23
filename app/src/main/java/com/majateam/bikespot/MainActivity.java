@@ -3,12 +3,13 @@ package com.majateam.bikespot;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -43,6 +44,7 @@ import com.majateam.bikespot.renderer.BikeRenderer;
 import com.majateam.bikespot.service.LocationService;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -57,38 +59,21 @@ import retrofit.Response;
 import retrofit.Retrofit;
 
 public class MainActivity extends BaseActivity implements LocationProvider.LocationCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
-    private static final String TAG = MainActivity.class.getSimpleName();
 
-    private LocationProvider mLocationProvider;
+    private static final String TAG = MainActivity.class.getSimpleName();
     private static final String BIKES_LIST = "bikesList";
     private static final String DOCKS_LIST = "docksList";
-    private ArrayList<Bike> mBikes = null;
-    private ArrayList<Dock> mDocks = null;
-    private ArrayList<ClusterItem> mClusterItems = null;
-    private ClusterManager<ClusterItem> mClusterManager;
     private static final int BIKES = 10;
     private static final int DOCKS = 20;
     private static final String CHOICE = "choice";
     private static final String MENU_VISIBILITY = "menu_visibility";
-    private int mChoice;
-    private double mCurrentLatitude;
-    private double mCurrentLongitude;
     private static final String CURRENT_LATITUDE = "currentLatitude";
     private static final String CURRENT_LONGITUDE = "currentLongitude";
-    private List<Polyline> mPolylines;
-    private static final String DESTINATION_LATITUDE = "destinationLatitude";
-    private static final String DESTINATION_LONGITUDE = "destinationLongitude";
     private static final int UNSAFE_SPOT = 30;
     private static final int NEUTRAL_SPOT = 40;
+    private static final int LOADING_SPOT = 50;
     private static final String SPOT = "spot";
-    private int mSpot = NEUTRAL_SPOT;
-    private Marker mUserMarker = null;
-    private Circle mCircle = null;
     private static final int NEUTRAL_DISTANCE = 300;
-    private boolean mLocationHandledFirst = false;
-    private Animation bottomDown;
-    private Animation bottomUp;
-    private BikeRenderer mBikeRenderer;
 
     @Bind(R.id.sub_menu)
     LinearLayout mSubMenu;
@@ -112,13 +97,43 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     TextView mBikeSpotBrand;
     @Bind(R.id.map_user_location)
     FloatingActionButton mLocateUser;
+    @Bind(R.id.empty_container)
+    LinearLayout mEmptyContainer;
+    @Bind(R.id.empty_icon)
+    ImageView mEmptyIcon;
+    @Bind(R.id.empty_title)
+    TextView mEmptyTitle;
+    @Bind(R.id.empty_subtitle)
+    TextView mEmptySubtitle;
+    @Bind(R.id.container)
+    FrameLayout mContainer;
+    @Bind(R.id.wrapper_coordinator)
+    CoordinatorLayout mCoordinatorLayout;
+
+    private LocationProvider mLocationProvider;
+    private ArrayList<Bike> mBikes = null;
+    private ArrayList<Dock> mDocks = null;
+    private ArrayList<ClusterItem> mClusterItems = null;
+    private ClusterManager<ClusterItem> mClusterManager;
+    private int mChoice;
+    private double mCurrentLatitude;
+    private double mCurrentLongitude;
+    private List<Polyline> mPolylines;
+    private int mSpot = LOADING_SPOT;
+    private Marker mUserMarker = null;
+    private Circle mCircle = null;
+    private boolean mLocationHandledFirst = false;
+    private BikeRenderer mBikeRenderer;
+    Snackbar mSnackBar;
+    private boolean mInternetConnected = true;
+    private Integer mConnectivityStatus = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
         Fabric.with(this, new Crashlytics());
-
+        initEmptyContainer();
         //set default choice
         if(savedInstanceState != null) {
             mCurrentLatitude = savedInstanceState.getDouble(CURRENT_LATITUDE);
@@ -129,8 +144,6 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             mSubMenu.setVisibility((savedInstanceState.getInt(MENU_VISIBILITY) == View.VISIBLE) ? View.VISIBLE : View.GONE);
             setChoice();
             mSpot = savedInstanceState.getInt(SPOT);
-            setSpotStatus();
-
         }else{
             mChoice = BIKES;
             mShowChoice.setText(com.majateam.bikespot.R.string.show_docks);
@@ -143,10 +156,6 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
         //init polylines array
         mPolylines = new ArrayList<>();
-        bottomDown = AnimationUtils.loadAnimation(this,
-                R.anim.bottom_down);
-        bottomUp = AnimationUtils.loadAnimation(this,
-                R.anim.bottom_up);
     }
 
     @Override
@@ -211,35 +220,62 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     }
 
     private void setSpotStatus(){
-        if(mSpot == UNSAFE_SPOT){
-            mBikeSpotStatusLayout.setBackgroundResource(R.color.red);
-            mBikeSpotStatus.setText(R.string.bike_unsafe_spot);
+        // Get back the mutable Circle
+        if(mCircle != null){
+            mCircle.remove();
+        }
+        if(mBikeSpotTitle.getVisibility() != View.VISIBLE) {
+            if (mSpot == UNSAFE_SPOT) {
+                mBikeSpotStatusLayout.setBackgroundResource(R.color.red);
+                mBikeSpotStatus.setText(R.string.bike_unsafe_spot);
+                // Instantiates a new CircleOptions object and defines the center and radius
+                CircleOptions circleOptions = new CircleOptions()
+                        .center(new LatLng(mCurrentLatitude, mCurrentLongitude))
+                        .radius(NEUTRAL_DISTANCE)
+                        .strokeColor(ContextCompat.getColor(this, R.color.transparent))
+                        .fillColor(ContextCompat.getColor(this, R.color.red_transparent)); // In meters
+                mCircle = getMap().addCircle(circleOptions);
+            } else if (mSpot == NEUTRAL_SPOT) {
+                mBikeSpotStatusLayout.setBackgroundResource(R.color.green);
+                mBikeSpotStatus.setText(R.string.bike_neutral_spot);
+            } else {
+                mBikeSpotStatusLayout.setBackgroundResource(R.color.grey);
+                mBikeSpotStatus.setText(R.string.loading);
+            }
+        }
+        if (mSpot == UNSAFE_SPOT) {
             // Instantiates a new CircleOptions object and defines the center and radius
             CircleOptions circleOptions = new CircleOptions()
                     .center(new LatLng(mCurrentLatitude, mCurrentLongitude))
                     .radius(NEUTRAL_DISTANCE)
                     .strokeColor(ContextCompat.getColor(this, R.color.transparent))
                     .fillColor(ContextCompat.getColor(this, R.color.red_transparent)); // In meters
-
-            // Get back the mutable Circle
-            if(mCircle != null){
-                mCircle.remove();
-            }
             mCircle = getMap().addCircle(circleOptions);
-        }else{
-            mBikeSpotStatusLayout.setBackgroundResource(R.color.green);
-            mBikeSpotStatus.setText(R.string.bike_neutral_spot);
         }
+    }
+
+    private void initEmptyContainer() {
+        mEmptyIcon.setImageResource(R.drawable.ic_wifi_black_48dp);
+        mEmptyTitle.setText(R.string.empty_no_internet_connection);
+        mEmptySubtitle.setText(getString(R.string.empty_please_connect));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if(mLocationProvider != null) {
-            mLocationProvider.connect();
-            if(mBikes == null || mBikes.size() == 0 || mDocks == null || mDocks.size() == 0){
-                callData();
+        if(getConnectivityStatus(this) != TYPE_NOT_CONNECTED) {
+            mContainer.setVisibility(View.VISIBLE);
+            mEmptyContainer.setVisibility(View.GONE);
+            setSpotStatus();
+            if (mLocationProvider != null) {
+                mLocationProvider.connect();
+                if (mBikes == null || mBikes.size() == 0 || mDocks == null || mDocks.size() == 0) {
+                    callData();
+                }
             }
+        }else{
+            mContainer.setVisibility(View.GONE);
+            mEmptyContainer.setVisibility(View.VISIBLE);
         }
     }
 
@@ -259,9 +295,11 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                     mBikeSpotDescription.setVisibility(View.VISIBLE);
                     mBikeSpotDescription.setText(bike.getDescription());
                     mBikeSpotBrand.setVisibility(View.VISIBLE);
-                    mBikeSpotBrand.setText(getString(R.string.brand) + " : " + bike.getBrand());
+                    String brand = getString(R.string.brand) + " : " + bike.getBrand();
+                    mBikeSpotBrand.setText(brand);
                     mBikeSpotStatus.setVisibility(View.GONE);
                     mLocateUser.setVisibility(View.GONE);
+                    mBikeSpotStatusLayout.setBackgroundResource(R.color.green);
                 }
             }
         }else{
@@ -325,11 +363,14 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     }
 
     @Override
-    protected void startDemo() {
+    protected void startApp() {
         GoogleMap map = getMap();
-        mLocationProvider = new LocationProvider(this, this);
-        mClusterManager = new ClusterManager<>(this, map);
-        mBikeRenderer = new BikeRenderer(getApplicationContext(), map, mClusterManager);
+        if(mLocationProvider == null)
+            mLocationProvider = new LocationProvider(this, this);
+        if(mClusterManager == null)
+            mClusterManager = new ClusterManager<>(this, map);
+        if(mBikeRenderer == null)
+            mBikeRenderer = new BikeRenderer(getApplicationContext(), map, mClusterManager);
         mClusterManager.setRenderer(mBikeRenderer);
         map.setOnCameraChangeListener(mClusterManager);
         map.setOnMarkerClickListener(this);
@@ -348,8 +389,9 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         final LocationService service = retrofit.create(LocationService.class);
-
-        Call<List<Bike>> callBikes = service.listBikes(Global.BIKES_URL);
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.YEAR, -1); // to get previous year add -1
+        Call<List<Bike>> callBikes = service.listBikes(Global.BIKES_URL, String.valueOf(cal.getTime().getTime()/1000));
         callBikes.enqueue(new Callback<List<Bike>>() {
 
             @Override
@@ -493,6 +535,54 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
             mBikeSpotBrand.setVisibility(View.GONE);
             mBikeSpotStatus.setVisibility(View.VISIBLE);
             mLocateUser.setVisibility(View.VISIBLE);
+            setSpotStatus();
         }
     }
+
+    @Override
+    protected void setSnackbarMessage() {
+        String internetStatus;
+        int connectionStatusCode = getConnectivityStatus(this);
+        if (connectionStatusCode != TYPE_NOT_CONNECTED) {
+            internetStatus = getString(R.string.internet_connected);
+        } else {
+            internetStatus = getString(R.string.lost_internet_connection);
+        }
+        mSnackBar = Snackbar
+                .make(mCoordinatorLayout, internetStatus, Snackbar.LENGTH_LONG)
+                .setAction("X", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mSnackBar.dismiss();
+                    }
+                });
+        // Changing message text color
+        mSnackBar.setActionTextColor(Color.BLACK);
+        // Changing action button text color
+        View sbView = mSnackBar.getView();
+        sbView.setBackgroundColor(ContextCompat.getColor(this, android.R.color.white));
+        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setTextColor(Color.BLACK);
+        if (connectionStatusCode == TYPE_NOT_CONNECTED) {
+            if (mInternetConnected) {
+                mSnackBar.show();
+                mInternetConnected = false;
+            }
+        } else {
+            if (!mInternetConnected) {
+                mInternetConnected = true;
+                mSnackBar.show();
+            }
+        }
+    }
+
+    @Override
+    protected void onNetworkConnectionUpdated(Integer connectivityCode){
+        if (mConnectivityStatus != null && mConnectivityStatus == TYPE_NOT_CONNECTED && connectivityCode != TYPE_NOT_CONNECTED && mEmptyContainer.getVisibility() == View.VISIBLE) {
+            //refresh if we are now connected
+            onResume();
+        }
+        mConnectivityStatus = connectivityCode;
+    }
+
 }

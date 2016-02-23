@@ -14,4 +14,9 @@
     <string name="bike_neutral_spot">Zone neutre</string>
     <string name="loading">Chargement…</string>
     <string name="brand">Marque</string>
+    <string name="internet_connected">Connecté à Internet</string>
+    <string name="lost_internet_connection">Vous n\'êtes plus connecté à Internet</string>
+    <string name="empty_no_internet_connection">Pas de réseau Internet</string>
+    <string name="empty_please_connect">Veuillez vous connecter à un réseau Internet afin d\'accéder aux données</string>
+    <string name="empty_container">icone pas de reseau internet</string>
 </resources>
