@@ -127,6 +127,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     Snackbar mSnackBar;
     private boolean mInternetConnected = true;
     private Integer mConnectivityStatus = null;
+    private Boolean mFirstTime;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -156,6 +157,8 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
         //init polylines array
         mPolylines = new ArrayList<>();
+        //First time the app is launched
+        mFirstTime = true;
     }
 
     @Override
@@ -221,20 +224,10 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
     private void setSpotStatus(){
         // Get back the mutable Circle
-        if(mCircle != null){
-            mCircle.remove();
-        }
         if(mBikeSpotTitle.getVisibility() != View.VISIBLE) {
             if (mSpot == UNSAFE_SPOT) {
                 mBikeSpotStatusLayout.setBackgroundResource(R.color.red);
                 mBikeSpotStatus.setText(R.string.bike_unsafe_spot);
-                // Instantiates a new CircleOptions object and defines the center and radius
-                CircleOptions circleOptions = new CircleOptions()
-                        .center(new LatLng(mCurrentLatitude, mCurrentLongitude))
-                        .radius(NEUTRAL_DISTANCE)
-                        .strokeColor(ContextCompat.getColor(this, R.color.transparent))
-                        .fillColor(ContextCompat.getColor(this, R.color.red_transparent)); // In meters
-                mCircle = getMap().addCircle(circleOptions);
             } else if (mSpot == NEUTRAL_SPOT) {
                 mBikeSpotStatusLayout.setBackgroundResource(R.color.green);
                 mBikeSpotStatus.setText(R.string.bike_neutral_spot);
@@ -245,12 +238,21 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         }
         if (mSpot == UNSAFE_SPOT) {
             // Instantiates a new CircleOptions object and defines the center and radius
-            CircleOptions circleOptions = new CircleOptions()
-                    .center(new LatLng(mCurrentLatitude, mCurrentLongitude))
-                    .radius(NEUTRAL_DISTANCE)
-                    .strokeColor(ContextCompat.getColor(this, R.color.transparent))
-                    .fillColor(ContextCompat.getColor(this, R.color.red_transparent)); // In meters
-            mCircle = getMap().addCircle(circleOptions);
+            if(mCircle == null) {
+                // Instantiates a new CircleOptions object and defines the center and radius
+                CircleOptions circleOptions = new CircleOptions()
+                        .center(new LatLng(mCurrentLatitude, mCurrentLongitude))
+                        .radius(NEUTRAL_DISTANCE)
+                        .strokeColor(ContextCompat.getColor(this, R.color.transparent))
+                        .fillColor(ContextCompat.getColor(this, R.color.red_transparent)); // In meters
+                mCircle = getMap().addCircle(circleOptions);
+            }else{
+                mCircle.setCenter(new LatLng(mCurrentLatitude, mCurrentLongitude));
+            }
+        }else{
+            if(mCircle != null){
+                mCircle.remove();
+            }
         }
     }
 
@@ -272,6 +274,13 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                 if (mBikes == null || mBikes.size() == 0 || mDocks == null || mDocks.size() == 0) {
                     callData();
                 }
+            }
+            //
+            if(!mFirstTime && getMap() != null && mUserMarker != null) {
+                mUserMarker.remove();
+                mUserMarker = null;
+            }else{
+                mFirstTime = false;
             }
         }else{
             mContainer.setVisibility(View.GONE);
