@@ -1,7 +1,7 @@
 # Bike Spot
 
 # v1.0.6
-- Minor correction: The red circle displayed when user iat -300m of a stolen bike was duplicated
+- Minor correction: The red circle displayed when user at -300m of a stolen bike was duplicated
 - Minor improvement: On app resume we center again on the user position
 
 #v1.0.5
