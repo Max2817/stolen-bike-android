@@ -530,6 +530,14 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         }
     }
 
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions,
+                                           int[] grantResults) {
+        if(mLocationProvider != null){
+            mLocationProvider.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
 
     @Override
     public void onMapClick(LatLng latLng) {
