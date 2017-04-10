@@ -5,6 +5,9 @@ package com.majateam.bikespot.helper;
  * Created by nmartino on 15-12-16.
  */
 public class MapHelper {
+
+
+
     /**
      *
      * @param lat1 Latitude of the First Location

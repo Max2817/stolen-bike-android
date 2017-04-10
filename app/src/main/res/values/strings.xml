@@ -18,4 +18,5 @@
     <string name="empty_no_internet_connection">No internet</string>
     <string name="empty_please_connect">Please connect to an Internet network in order to access the data</string>
     <string name="empty_container">No internet icon</string>
+    <string name="map_token" translatable="false">pk.eyJ1Ijoibm1hcnRpbm8iLCJhIjoiY2oxbTVmdHFkMDAyMzJxdGF6eWc2ZDcxdCJ9.BoNE0XxjQL_zgSopfP1J-g</string>
 </resources>

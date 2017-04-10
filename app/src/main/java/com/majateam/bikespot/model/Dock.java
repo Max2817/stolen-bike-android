@@ -1,68 +1,37 @@
 package com.majateam.bikespot.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import org.parceler.Parcel;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.maps.android.clustering.ClusterItem;
+import io.realm.DockRealmProxy;
+import io.realm.RealmObject;
 
 /**
- * Created by Nicolas Martino on 08/06/15.
+ * Stolen Bike Created by Nicolas Martino on 08/06/15.
  */
-public class Dock implements ClusterItem, Parcelable {
+@Parcel(implementations = { DockRealmProxy.class },
+        value = Parcel.Serialization.BEAN,
+        analyze = { Dock.class })
+public class Dock extends RealmObject {
     private String lat;
     private String lng;
 
-    public String getLat() {
+    String getLat() {
         return lat;
     }
 
-    public void setLat(String lat) {
+    void setLat(String lat) {
         this.lat = lat;
     }
 
-    public String getLng() {
+    String getLng() {
         return lng;
     }
 
-    public void setLng(String lng) {
+    void setLng(String lng) {
         this.lng = lng;
     }
 
-
-    // To prevent someone from accidentally instantiating the contract class,
-    // give it an empty constructor.
-    public Dock() {}
-
-    @Override
-    public LatLng getPosition() {
-        return new LatLng(Double.valueOf(lat), Double.valueOf(lng));
+    public Dock() {
+        // Needed public for Parceler
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(lat);
-        dest.writeString(lng);
-    }
-
-    public static final Parcelable.Creator<Dock> CREATOR = new Parcelable.Creator<Dock>() {
-
-        public Dock createFromParcel(Parcel source) {
-
-            Dock dock = new Dock();
-            dock.lat = source.readString();
-            dock.lng = source.readString();
-            return dock;
-        }
-
-        @Override
-        public Dock[] newArray(int size) {
-            return new Dock[size];
-        }
-    };
 }

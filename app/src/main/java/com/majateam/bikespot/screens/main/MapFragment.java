@@ -1,156 +1,131 @@
-package com.majateam.bikespot;
+package com.majateam.bikespot.screens.main;
 
-import android.graphics.Color;
-import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.akexorcist.googledirection.DirectionCallback;
-import com.akexorcist.googledirection.GoogleDirection;
-import com.akexorcist.googledirection.constant.TransportMode;
-import com.akexorcist.googledirection.constant.Unit;
-import com.akexorcist.googledirection.model.Direction;
-import com.akexorcist.googledirection.model.Info;
-import com.akexorcist.googledirection.util.DirectionConverter;
-import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.android.clustering.ClusterItem;
-import com.google.maps.android.clustering.ClusterManager;
-import com.majateam.bikespot.helper.DateHelper;
-import com.majateam.bikespot.helper.MapHelper;
+import com.majateam.bikespot.R;
+import com.majateam.bikespot.base.BaseFragment;
 import com.majateam.bikespot.model.Bike;
 import com.majateam.bikespot.model.Dock;
 import com.majateam.bikespot.provider.LocationProvider;
-import com.majateam.bikespot.renderer.BikeRenderer;
-import com.majateam.bikespot.service.LocationService;
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
+import butterknife.BindView;
 import butterknife.OnClick;
-import io.fabric.sdk.android.Fabric;
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.GsonConverterFactory;
-import retrofit.Response;
-import retrofit.Retrofit;
+import icepick.State;
 
-public class MainActivity extends BaseActivity implements LocationProvider.LocationCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
+/**
+ * Stolen Bike Created by nmartino on 2017-04-17.
+ */
 
-    private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String BIKES_LIST = "bikesList";
-    private static final String DOCKS_LIST = "docksList";
+public class MapFragment extends BaseFragment {
+
+    @BindView(R.id.sub_menu)
+    LinearLayout mSubMenu;
+    @BindView(R.id.display_choice)
+    TextView mDisplayChoice;
+    @BindView(R.id.show_choice_txt)
+    TextView mShowChoice;
+    @BindView(R.id.choice_icon)
+    ImageView mChoiceIcon;
+    @BindView(R.id.show_icon)
+    ImageView mShowIcon;
+    @BindView(R.id.bike_spot_status_layout)
+    LinearLayout mBikeSpotStatusLayout;
+    @BindView(R.id.bike_spot_status)
+    TextView mBikeSpotStatus;
+    @BindView(R.id.bike_spot_title)
+    TextView mBikeSpotTitle;
+    @BindView(R.id.bike_spot_description)
+    TextView mBikeSpotDescription;
+    @BindView(R.id.bike_spot_brand)
+    TextView mBikeSpotBrand;
+    @BindView(R.id.map_user_location)
+    FloatingActionButton mLocateUser;
+    @BindView(R.id.empty_container)
+    LinearLayout mEmptyContainer;
+    @BindView(R.id.empty_icon)
+    ImageView mEmptyIcon;
+    @BindView(R.id.empty_title)
+    TextView mEmptyTitle;
+    @BindView(R.id.empty_subtitle)
+    TextView mEmptySubtitle;
+    @BindView(R.id.container)
+    FrameLayout mContainer;
+    @BindView(R.id.wrapper_coordinator)
+    CoordinatorLayout mCoordinatorLayout;
+
     private static final int BIKES = 10;
     private static final int DOCKS = 20;
-    private static final String CHOICE = "choice";
-    private static final String MENU_VISIBILITY = "menu_visibility";
-    private static final String CURRENT_LATITUDE = "currentLatitude";
-    private static final String CURRENT_LONGITUDE = "currentLongitude";
     private static final int UNSAFE_SPOT = 30;
     private static final int NEUTRAL_SPOT = 40;
     private static final int LOADING_SPOT = 50;
-    private static final String SPOT = "spot";
     private static final int NEUTRAL_DISTANCE = 300;
 
-    @Bind(R.id.sub_menu)
-    LinearLayout mSubMenu;
-    @Bind(R.id.display_choice)
-    TextView mDisplayChoice;
-    @Bind(R.id.show_choice_txt)
-    TextView mShowChoice;
-    @Bind(R.id.choice_icon)
-    ImageView mChoiceIcon;
-    @Bind(R.id.show_icon)
-    ImageView mShowIcon;
-    @Bind(R.id.bike_spot_status_layout)
-    LinearLayout mBikeSpotStatusLayout;
-    @Bind(R.id.bike_spot_status)
-    TextView mBikeSpotStatus;
-    @Bind(R.id.bike_spot_title)
-    TextView mBikeSpotTitle;
-    @Bind(R.id.bike_spot_description)
-    TextView mBikeSpotDescription;
-    @Bind(R.id.bike_spot_brand)
-    TextView mBikeSpotBrand;
-    @Bind(R.id.map_user_location)
-    FloatingActionButton mLocateUser;
-    @Bind(R.id.empty_container)
-    LinearLayout mEmptyContainer;
-    @Bind(R.id.empty_icon)
-    ImageView mEmptyIcon;
-    @Bind(R.id.empty_title)
-    TextView mEmptyTitle;
-    @Bind(R.id.empty_subtitle)
-    TextView mEmptySubtitle;
-    @Bind(R.id.container)
-    FrameLayout mContainer;
-    @Bind(R.id.wrapper_coordinator)
-    CoordinatorLayout mCoordinatorLayout;
-
     private LocationProvider mLocationProvider;
-    private ArrayList<Bike> mBikes = null;
-    private ArrayList<Dock> mDocks = null;
-    private ArrayList<ClusterItem> mClusterItems = null;
-    private ClusterManager<ClusterItem> mClusterManager;
-    private int mChoice;
-    private double mCurrentLatitude;
-    private double mCurrentLongitude;
+    @State
+    ArrayList<Bike> mBikes = null;
+    @State
+    ArrayList<Dock> mDocks = null;
+    //private ArrayList<ClusterItem> mClusterItems = null;
+    //private ClusterManager<ClusterItem> mClusterManager;
+    @State
+    int mChoice;
+    @State
+    double mCurrentLatitude;
+    @State
+    double mCurrentLongitude;
+    @State
+    int mMenuVisibilityState;
     private List<Polyline> mPolylines;
-    private int mSpot = LOADING_SPOT;
+    @State
+    int mSpot = LOADING_SPOT;
     private Marker mUserMarker = null;
     private Circle mCircle = null;
     private boolean mLocationHandledFirst = false;
-    private BikeRenderer mBikeRenderer;
     Snackbar mSnackBar;
     private boolean mInternetConnected = true;
     private Integer mConnectivityStatus = null;
     private Boolean mFirstTime;
 
+    @BindView(R.id.map)
+    MapView mapView;
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ButterKnife.bind(this);
-        Fabric.with(this, new Crashlytics());
-        initEmptyContainer();
+
+        //initEmptyContainer();
+        //mSubMenu.setVisibility((mMenuVisibilityState == View.VISIBLE) ? View.VISIBLE : View.GONE);
         //set default choice
-        if(savedInstanceState != null) {
-            mCurrentLatitude = savedInstanceState.getDouble(CURRENT_LATITUDE);
-            mCurrentLongitude = savedInstanceState.getDouble(CURRENT_LONGITUDE);
-            mBikes = savedInstanceState.getParcelableArrayList(BIKES_LIST);
-            mDocks = savedInstanceState.getParcelableArrayList(DOCKS_LIST);
-            mChoice = savedInstanceState.getInt(CHOICE);
-            mSubMenu.setVisibility((savedInstanceState.getInt(MENU_VISIBILITY) == View.VISIBLE) ? View.VISIBLE : View.GONE);
-            setChoice();
-            mSpot = savedInstanceState.getInt(SPOT);
-        }else{
+        // Mapbox access token is configured here. This needs to be called either in your application
+        // object or in the same activity which contains the mapview.
+        Mapbox.getInstance(getActivity(), getString(R.string.map_token));
+        if (savedInstanceState == null) {
             mChoice = BIKES;
-            mShowChoice.setText(com.majateam.bikespot.R.string.show_docks);
-            mDisplayChoice.setText(com.majateam.bikespot.R.string.bikes);
-            mChoiceIcon.setImageResource(R.drawable.ic_legend_stolen);
-            mShowIcon.setImageResource(R.drawable.ic_legend_dock);
+            //mShowChoice.setText(com.majateam.bikespot.R.string.show_docks);
+            //mDisplayChoice.setText(com.majateam.bikespot.R.string.bikes);
+            //mChoiceIcon.setImageResource(R.drawable.ic_legend_stolen);
+            //mShowIcon.setImageResource(R.drawable.ic_legend_dock);
             mBikes = new ArrayList<>();
             mDocks = new ArrayList<>();
         }
@@ -159,21 +134,83 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         mPolylines = new ArrayList<>();
         //First time the app is launched
         mFirstTime = true;
+
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(MapboxMap mapboxMap) {
+                mapboxMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(48.13863, 11.57603))
+                        .title("Hello World!")
+                        .snippet("Welcome to my marker."));
+
+            }
+        });
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(CHOICE, mChoice);
-        outState.putInt(MENU_VISIBILITY, mSubMenu.getVisibility());
-        outState.putInt(SPOT, mSpot);
-        outState.putDouble(CURRENT_LATITUDE, mCurrentLatitude);
-        outState.putDouble(CURRENT_LONGITUDE, mCurrentLongitude);
-        outState.putParcelableArrayList(BIKES_LIST, mBikes);
-        outState.putParcelableArrayList(DOCKS_LIST, mDocks);
-        if(mClusterManager != null) {
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+        /*if (getConnectivityStatus(this) != TYPE_NOT_CONNECTED) {
+            mContainer.setVisibility(View.VISIBLE);
+            mEmptyContainer.setVisibility(View.GONE);
+            setSpotStatus();
+            if (mLocationProvider != null) {
+                mLocationProvider.connect();
+                if (mBikes == null || mBikes.size() == 0 || mDocks == null || mDocks.size() == 0) {
+                    callData();
+                }
+            }
+            if (!mFirstTime && getMap() != null && mUserMarker != null) {
+                mUserMarker.remove();
+                mUserMarker = null;
+            } else {
+                mFirstTime = false;
+            }
+        } else {
+            mContainer.setVisibility(View.GONE);
+            mEmptyContainer.setVisibility(View.VISIBLE);
+        }*/
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+        /*if (mClusterManager != null) {
             mClusterManager.clearItems();
-        }
+        }*/
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     @OnClick(R.id.card_view)
@@ -181,21 +218,26 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         mSubMenu.setVisibility((mSubMenu.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
     }
 
-    @OnClick(R.id.show_choice)
+    /*@OnClick(R.id.show_choice)
     public void showChoice() {
         updateChoice();
         showPopup();
         removeDestination();
+    }*/
+
+    @Override
+    protected int getLayout() {
+        return R.layout.map;
     }
 
-    private void updateChoice(){
-        if(mChoice == BIKES){
+    /*private void updateChoice() {
+        if (mChoice == BIKES) {
             mChoice = DOCKS;
             mShowChoice.setText(com.majateam.bikespot.R.string.show_bikes);
             mDisplayChoice.setText(com.majateam.bikespot.R.string.docks);
             mChoiceIcon.setImageResource(R.drawable.ic_legend_dock);
             mShowIcon.setImageResource(R.drawable.ic_legend_stolen);
-        }else{
+        } else {
             mChoice = BIKES;
             mShowChoice.setText(com.majateam.bikespot.R.string.show_docks);
             mDisplayChoice.setText(com.majateam.bikespot.R.string.bikes);
@@ -205,14 +247,14 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         setClusterItems(mChoice);
     }
 
-    private void setChoice(){
-        if(mChoice == BIKES){
+    private void setChoice() {
+        if (mChoice == BIKES) {
             mChoice = BIKES;
             mShowChoice.setText(com.majateam.bikespot.R.string.show_docks);
             mDisplayChoice.setText(com.majateam.bikespot.R.string.bikes);
             mChoiceIcon.setImageResource(R.drawable.ic_legend_stolen);
             mShowIcon.setImageResource(R.drawable.ic_legend_dock);
-        }else{
+        } else {
             mChoice = DOCKS;
             mShowChoice.setText(com.majateam.bikespot.R.string.show_bikes);
             mDisplayChoice.setText(com.majateam.bikespot.R.string.docks);
@@ -222,9 +264,9 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         setClusterItems(mChoice);
     }
 
-    private void setSpotStatus(){
+    private void setSpotStatus() {
         // Get back the mutable Circle
-        if(mBikeSpotTitle.getVisibility() != View.VISIBLE) {
+        if (mBikeSpotTitle.getVisibility() != View.VISIBLE) {
             if (mSpot == UNSAFE_SPOT) {
                 mBikeSpotStatusLayout.setBackgroundResource(R.color.red);
                 mBikeSpotStatus.setText(R.string.bike_unsafe_spot);
@@ -238,7 +280,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         }
         if (mSpot == UNSAFE_SPOT) {
             // Instantiates a new CircleOptions object and defines the center and radius
-            if(mCircle == null) {
+            if (mCircle == null) {
                 // Instantiates a new CircleOptions object and defines the center and radius
                 CircleOptions circleOptions = new CircleOptions()
                         .center(new LatLng(mCurrentLatitude, mCurrentLongitude))
@@ -246,11 +288,11 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                         .strokeColor(ContextCompat.getColor(this, R.color.transparent))
                         .fillColor(ContextCompat.getColor(this, R.color.red_transparent)); // In meters
                 mCircle = getMap().addCircle(circleOptions);
-            }else{
+            } else {
                 mCircle.setCenter(new LatLng(mCurrentLatitude, mCurrentLongitude));
             }
-        }else{
-            if(mCircle != null){
+        } else {
+            if (mCircle != null) {
                 mCircle.remove();
             }
         }
@@ -263,37 +305,11 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if(getConnectivityStatus(this) != TYPE_NOT_CONNECTED) {
-            mContainer.setVisibility(View.VISIBLE);
-            mEmptyContainer.setVisibility(View.GONE);
-            setSpotStatus();
-            if (mLocationProvider != null) {
-                mLocationProvider.connect();
-                if (mBikes == null || mBikes.size() == 0 || mDocks == null || mDocks.size() == 0) {
-                    callData();
-                }
-            }
-            //
-            if(!mFirstTime && getMap() != null && mUserMarker != null) {
-                mUserMarker.remove();
-                mUserMarker = null;
-            }else{
-                mFirstTime = false;
-            }
-        }else{
-            mContainer.setVisibility(View.GONE);
-            mEmptyContainer.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
     public boolean onMarkerClick(Marker marker) {
-        if(mChoice == DOCKS && !marker.getPosition().equals(new LatLng(mCurrentLatitude, mCurrentLongitude))) {
+        if (mChoice == DOCKS && !marker.getPosition().equals(new LatLng(mCurrentLatitude, mCurrentLongitude))) {
             LatLng destPosition = marker.getPosition();
             drawDestination(destPosition, marker);
-        }else if(mChoice == BIKES && !marker.getPosition().equals(new LatLng(mCurrentLatitude, mCurrentLongitude))){
+        } else if (mChoice == BIKES && !marker.getPosition().equals(new LatLng(mCurrentLatitude, mCurrentLongitude))) {
             marker.showInfoWindow();
             if (mBikeRenderer != null) {
                 HashMap<String, ClusterItem> clusterItemMarkerMap = mBikeRenderer.getmMarkerClusterItemMap();
@@ -311,14 +327,14 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                     mBikeSpotStatusLayout.setBackgroundResource(R.color.green);
                 }
             }
-        }else{
+        } else {
             removeDestination();
             hideMarkerInfo();
         }
         return true;
     }
 
-    private void drawDestination(LatLng destination, final Marker marker){
+    private void drawDestination(LatLng destination, final Marker marker) {
         //if it already exists a polyline we remove it
 
         removeDestination();
@@ -334,7 +350,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                 .unit(Unit.METRIC)
                 .execute(new DirectionCallback() {
                     @Override
-                    public void onDirectionSuccess(Direction direction) {
+                    public void onDirectionSuccess(Direction direction, String rawBody) {
                         // Do something here
                         //String status = direction.getStatus();
                         Info durationInfo = direction.getRouteList().get(0).getLegList().get(0).getDuration();
@@ -362,8 +378,8 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                 });
     }
 
-    private void removeDestination(){
-        if(mPolylines.size() > 0) {
+    private void removeDestination() {
+        if (mPolylines.size() > 0) {
             for (Polyline line : mPolylines) {
                 line.remove();
             }
@@ -374,14 +390,14 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     @Override
     protected void startApp() {
         GoogleMap map = getMap();
-        if(mLocationProvider == null)
+        if (mLocationProvider == null)
             mLocationProvider = new LocationProvider(this, this);
-        if(mClusterManager == null)
+        if (mClusterManager == null)
             mClusterManager = new ClusterManager<>(this, map);
-        if(mBikeRenderer == null)
+        if (mBikeRenderer == null)
             mBikeRenderer = new BikeRenderer(getApplicationContext(), map, mClusterManager);
         mClusterManager.setRenderer(mBikeRenderer);
-        map.setOnCameraChangeListener(mClusterManager);
+        map.setOnCameraIdleListener(mClusterManager);
         map.setOnMarkerClickListener(this);
         map.setOnMapClickListener(this);
 
@@ -391,7 +407,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
 
     }
 
-    private void callData(){
+    private void callData() {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Global.ENDPOINT)
@@ -400,11 +416,11 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         final LocationService service = retrofit.create(LocationService.class);
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.YEAR, -1); // to get previous year add -1
-        Call<List<Bike>> callBikes = service.listBikes(Global.BIKES_URL, String.valueOf(cal.getTime().getTime()/1000));
+        Call<List<Bike>> callBikes = service.listBikes(Global.BIKES_URL, String.valueOf(cal.getTime().getTime() / 1000));
         callBikes.enqueue(new Callback<List<Bike>>() {
 
             @Override
-            public void onResponse(Response<List<Bike>> response, Retrofit retrofit) {
+            public void onResponse(Call<List<Bike>> call, Response<List<Bike>> response) {
                 if (response.body() != null) {
                     mBikes.clear();
                     mBikes.addAll(response.body());
@@ -414,7 +430,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                 callDocks.enqueue(new Callback<List<Dock>>() {
 
                     @Override
-                    public void onResponse(Response<List<Dock>> response, Retrofit retrofit) {
+                    public void onResponse(Call<List<Dock>> call, Response<List<Dock>> response) {
                         if (response.body() != null) {
                             mDocks.clear();
                             mDocks.addAll(response.body());
@@ -425,26 +441,25 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
                             mLocationProvider.callNewLocation();
                             mLocationHandledFirst = false;
                         }
+                        setChoice();
                     }
 
                     @Override
-                    public void onFailure(Throwable t) {
-                        // you should handle errors, too
+                    public void onFailure(Call<List<Dock>> call, Throwable throwable) {
+                        Log.d("Dock call failed %s", throwable.getMessage());
                     }
                 });
             }
 
             @Override
-            public void onFailure(Throwable t) {
-                // you should handle errors, too
+            public void onFailure(Call<List<Bike>> call, Throwable throwable) {
+                Log.d("Bikes call failed %s", throwable.getMessage());
             }
         });
     }
 
-    /**
-     * False user location used only for android emulator
-     */
-    private void setFalseUserLocation(){
+    // False user location used only for android emulator
+    private void setFalseUserLocation() {
         mCurrentLatitude = 45.5486;
         mCurrentLongitude = -73.5788;
         GoogleMap map = getMap();
@@ -456,34 +471,28 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     }
 
     private void setClusterItems(int type) {
-        if(mClusterManager == null){
+        if (mClusterManager == null) {
             GoogleMap map = getMap();
             mClusterManager = new ClusterManager<>(this, map);
             mBikeRenderer = new BikeRenderer(getApplicationContext(), map, mClusterManager);
             mClusterManager.setRenderer(mBikeRenderer);
-            map.setOnCameraChangeListener(mClusterManager);
+            map.setOnCameraIdleListener(mClusterManager);
         }
         mClusterManager.clearItems();
-        if(mClusterItems == null){
+        if (mClusterItems == null) {
             mClusterItems = new ArrayList<>();
-        }else{
+        } else {
             mClusterItems.clear();
         }
         if (type == BIKES && mBikes != null) {
             mClusterItems.addAll(mBikes);
-        }else if(mDocks != null){
+        } else if (mDocks != null) {
             mClusterItems.addAll(mDocks);
         }
-        if(mClusterItems != null && mClusterItems.size() > 0){
+        if (mClusterItems != null && mClusterItems.size() > 0) {
             mClusterManager.addItems(mClusterItems);
         }
         mClusterManager.cluster();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mLocationProvider.disconnect();
     }
 
     public void handleNewLocation(Location location) {
@@ -491,29 +500,29 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         mCurrentLongitude = location.getLongitude();
         LatLng latLng = new LatLng(mCurrentLatitude, mCurrentLongitude);
         GoogleMap map = getMap();
-        if(mUserMarker == null){
+        if (mUserMarker == null) {
             MarkerOptions options = new MarkerOptions().position(latLng)
                     .icon(BitmapDescriptorFactory.fromResource(com.majateam.bikespot.R.drawable.ic_user_location));
             mUserMarker = map.addMarker(options);
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));
-        }else{
+        } else {
             mUserMarker.setPosition(latLng);
         }
 
         //check if there is any recent stolen bike (< 6 months) around me 300m
-        if(mChoice == BIKES){
-            if(mBikes != null && mBikes.size() > 0) {
+        if (mChoice == BIKES) {
+            if (mBikes != null && mBikes.size() > 0) {
                 long todayMinusSixMonths = DateHelper.getDateMonthsAgo(6).getTime();
                 mSpot = NEUTRAL_SPOT;
-                for (Bike bike :  mBikes) {
-                    if (bike.getRawDate()*1000 >= todayMinusSixMonths && MapHelper.distFrom((float) mCurrentLatitude, (float) mCurrentLongitude, Float.valueOf(bike.getLat()), Float.valueOf(bike.getLng())) <= NEUTRAL_DISTANCE) {
+                for (Bike bike : mBikes) {
+                    if (bike.getRawDate() * 1000 >= todayMinusSixMonths && MapHelper.distFrom((float) mCurrentLatitude, (float) mCurrentLongitude, Float.valueOf(bike.getLat()), Float.valueOf(bike.getLng())) <= NEUTRAL_DISTANCE) {
                         mSpot = UNSAFE_SPOT;
                         break;
                     }
                 }
                 setSpotStatus();
-            }else{
-                if(mCircle != null){
+            } else {
+                if (mCircle != null) {
                     mCircle.remove();
                 }
                 mLocationHandledFirst = true;
@@ -525,7 +534,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     @OnClick(R.id.map_user_location)
     public void showUserLocation() {
         GoogleMap map = getMap();
-        if(map != null) {
+        if (map != null) {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLatitude, mCurrentLongitude), 15.0f));
         }
     }
@@ -533,7 +542,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions,
                                            int[] grantResults) {
-        if(mLocationProvider != null){
+        if (mLocationProvider != null) {
             mLocationProvider.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
@@ -545,8 +554,8 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
         hideMarkerInfo();
     }
 
-    private void hideMarkerInfo(){
-        if(mBikeSpotTitle.getVisibility() == View.VISIBLE){
+    private void hideMarkerInfo() {
+        if (mBikeSpotTitle.getVisibility() == View.VISIBLE) {
             mBikeSpotTitle.setVisibility(View.GONE);
             mBikeSpotDescription.setVisibility(View.GONE);
             mBikeSpotBrand.setVisibility(View.GONE);
@@ -557,7 +566,7 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     }
 
     @Override
-    protected void setSnackbarMessage() {
+    protected void setSnackBarMessage() {
         String internetStatus;
         int connectionStatusCode = getConnectivityStatus(this);
         if (connectionStatusCode != TYPE_NOT_CONNECTED) {
@@ -594,12 +603,11 @@ public class MainActivity extends BaseActivity implements LocationProvider.Locat
     }
 
     @Override
-    protected void onNetworkConnectionUpdated(Integer connectivityCode){
+    protected void onNetworkConnectionUpdated(Integer connectivityCode) {
         if (mConnectivityStatus != null && mConnectivityStatus == TYPE_NOT_CONNECTED && connectivityCode != TYPE_NOT_CONNECTED && mEmptyContainer.getVisibility() == View.VISIBLE) {
             //refresh if we are now connected
             onResume();
         }
         mConnectivityStatus = connectivityCode;
-    }
-
+    }*/
 }

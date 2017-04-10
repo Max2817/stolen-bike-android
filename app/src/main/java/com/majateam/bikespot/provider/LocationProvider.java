@@ -1,30 +1,15 @@
 package com.majateam.bikespot.provider;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.content.IntentSender;
-import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.majateam.bikespot.MainActivity;
+import com.mapzen.android.lost.api.LocationRequest;
 
 /**
  * Created by nmartino on 12/17/14.
  */
-public class LocationProvider implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+public class LocationProvider {
 
     public interface LocationCallback {
         void handleNewLocation(Location location);
@@ -45,7 +30,7 @@ public class LocationProvider implements
     private Boolean mResolvingError;
 
     public LocationProvider(Context context, LocationCallback callback) {
-        mGoogleApiClient = new GoogleApiClient.Builder(context)
+        /*mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
@@ -60,10 +45,10 @@ public class LocationProvider implements
                 .setFastestInterval(1000); // 1 second, in milliseconds
 
         mContext = context;
-        mResolvingError = false;
+        mResolvingError = false;*/
     }
 
-    public void connect() {
+    /*public void connect() {
         mGoogleApiClient.connect();
     }
 
@@ -126,12 +111,6 @@ public class LocationProvider implements
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        /*
-         * Google Play services can resolve some errors it detects.
-         * If the error has a resolution, try sending an Intent to
-         * start a Google Play services activity that can resolve
-         * error.
-         */
         if (!mResolvingError) {
             // Already attempting to resolve an error.
             if (connectionResult.hasResolution() && mContext instanceof Activity) {
@@ -140,20 +119,12 @@ public class LocationProvider implements
                     Activity activity = (Activity)mContext;
                     // Start an Activity that tries to resolve the error
                     connectionResult.startResolutionForResult(activity, CONNECTION_FAILURE_RESOLUTION_REQUEST);
-                /*
-                 * Thrown if Google Play services canceled the original
-                 * PendingIntent
-                 */
                 } catch (IntentSender.SendIntentException e) {
                     // Log the error
                     e.printStackTrace();
                     mGoogleApiClient.connect();
                 }
             } else {
-                /*
-                 * If no resolution is available, display a dialog to the
-                 * user with the error.
-                 */
                 //showErrorDialog(result.getErrorCode());
                 mResolvingError = true;
                 Log.i(TAG, "Location services connection failed with code " + connectionResult.getErrorCode());
@@ -165,5 +136,5 @@ public class LocationProvider implements
     @Override
     public void onLocationChanged(Location location) {
         mLocationCallback.handleNewLocation(location);
-    }
+    }*/
 }
