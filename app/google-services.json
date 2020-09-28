@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "667355500969",
+    "firebase_url": "https://stolen-bike-8e4fe.firebaseio.com",
+    "project_id": "stolen-bike-8e4fe",
+    "storage_bucket": "stolen-bike-8e4fe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:667355500969:android:7ef72805311a7d864eb4b8",
+        "android_client_info": {
+          "package_name": "com.majateam.bikespot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "667355500969-oor4utqjdqqobd1u2vb2rqolum5qf4ic.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkFW-twXH715xeJn2coYZJR-PjBqilXWA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "667355500969-oor4utqjdqqobd1u2vb2rqolum5qf4ic.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

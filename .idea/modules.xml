@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/stolen-bike-android.iml" filepath="$PROJECT_DIR$/stolen-bike-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="stolen-bike-android/app" />
+      <module fileurl="file://$PROJECT_DIR$/stolen-bike-android.iml" filepath="$PROJECT_DIR$/stolen-bike-android.iml" group="stolen-bike-android" />
     </modules>
   </component>
 </project>
