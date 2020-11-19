@@ -1,54 +1,12 @@
-package com.majateam.bikespot.provider;
+package com.majateam.bikespot.provider
 
-import android.content.Context;
-import android.location.Location;
-
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.mapzen.android.lost.api.LocationRequest;
+import android.content.Context
+import android.location.Location
 
 /**
  * Created by nmartino on 12/17/14.
  */
-public class LocationProvider {
-
-    public interface LocationCallback {
-        void handleNewLocation(Location location);
-    }
-
-    public static final String TAG = LocationProvider.class.getSimpleName();
-    public static final int REQUEST_LOCATION = 100;
-    /*
-     * Define a request code to send to Google Play services
-     * This code is returned in Activity.onActivityResult
-     */
-    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-
-    private LocationCallback mLocationCallback;
-    private Context mContext;
-    private GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
-    private Boolean mResolvingError;
-
-    public LocationProvider(Context context, LocationCallback callback) {
-        /*mGoogleApiClient = new GoogleApiClient.Builder(context)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-
-        mLocationCallback = callback;
-
-        // Create the LocationRequest object
-        mLocationRequest = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
-                .setFastestInterval(1000); // 1 second, in milliseconds
-
-        mContext = context;
-        mResolvingError = false;*/
-    }
-
-    /*public void connect() {
+class LocationProvider(context: Context?, callback: LocationCallback?) /*public void connect() {
         mGoogleApiClient.connect();
     }
 
@@ -136,5 +94,23 @@ public class LocationProvider {
     @Override
     public void onLocationChanged(Location location) {
         mLocationCallback.handleNewLocation(location);
-    }*/
+    }*/ {
+    interface LocationCallback {
+        fun handleNewLocation(location: Location?)
+    }
+
+    private val mLocationCallback: LocationCallback? = null
+    private val mContext: Context? = null
+    private val mResolvingError: Boolean? = null
+
+    companion object {
+        val TAG = LocationProvider::class.java.simpleName
+        const val REQUEST_LOCATION = 100
+
+        /*
+     * Define a request code to send to Google Play services
+     * This code is returned in Activity.onActivityResult
+     */
+        private const val CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000
+    }
 }

@@ -5,6 +5,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'realm-android'
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'dagger.hilt.android.plugin'
 
 repositories {
     maven { url "https://clojars.org/repo/" }
@@ -13,13 +14,13 @@ repositories {
 
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion "29.0.3"
 
     defaultConfig {
         applicationId "com.majateam.bikespot"
         minSdkVersion 23
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 112
         versionName "1.0.7"
     }
@@ -29,26 +30,56 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    buildFeatures {
+        dataBinding true
+    }
 }
 
 dependencies {
     def appcompat_version = "1.2.0"
     def retrofit_version = "2.6.2"
+    def room_version = "2.2.5"
 
     implementation "androidx.appcompat:appcompat:$appcompat_version"
     implementation "androidx.appcompat:appcompat-resources:$appcompat_version"
+    implementation "androidx.activity:activity-ktx:1.1.0"
+    implementation "com.google.dagger:hilt-android:2.28-alpha"
+    kapt "com.google.dagger:hilt-android-compiler:2.28-alpha"
+    implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02'
+    kapt 'androidx.hilt:hilt-compiler:1.0.0-alpha02'
 
-    implementation 'com.google.firebase:firebase-analytics:17.5.0'
-    implementation 'com.google.firebase:firebase-crashlytics:17.2.1'
+    implementation platform('com.google.firebase:firebase-bom:25.12.0')
+
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
 
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
-    implementation 'com.akexorcist:googledirectionlibrary:1.0.5'
-    implementation('com.mapbox.mapboxsdk:mapbox-android-sdk:5.0.2@aar') {
-        transitive = true
-    }
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.5.0'
     implementation 'com.jakewharton.timber:timber:4.7.1'
-    implementation "androidx.core:core-ktx:1.3.1"
+    implementation "androidx.core:core-ktx:1.3.2"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    implementation 'com.akexorcist:google-direction-library:1.2.1'
+    implementation "androidx.cardview:cardview:1.0.0"
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation "androidx.constraintlayout:constraintlayout:2.0.2"
+
+    implementation 'com.karumi:dexter:6.2.1'
+
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation "androidx.room:room-ktx:$room_version"
+
+    // optional - Test helpers
+    testImplementation "androidx.room:room-testing:$room_version"
+
 }

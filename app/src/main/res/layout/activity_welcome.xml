@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+                name="viewmodel"
+                type="com.majateam.bikespot.welcome.viewmodel.WelcomeViewModel" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/design_default_color_background">
+
+        <!-- icon credit Nikita Golubev -->
+        <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/welcome_permission_location_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_permission_location"
+                app:layout_constraintBottom_toTopOf="@+id/welcome_permission_location_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                android:tint="@color/green"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@id/welcome_permission_location_description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="46dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="46dp"
+                android:gravity="center"
+                android:text="@string/permission_location_description"
+                android:textColor="@android:color/black"
+                app:layout_constraintBottom_toTopOf="@+id/welcome_permission_location_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/welcome_permission_location_image" />
+
+        <Button
+                android:id="@id/welcome_permission_location_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/permission_location_button"
+                android:background="@color/green"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/welcome_permission_location_description" />
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:stateListAnimator="@null"
+                android:text="@string/permission_skip"
+                android:theme="@style/Widget.MaterialComponents.Button.TextButton"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textSize="16sp"
+                android:textColor="@color/green"
+                android:drawableEnd="@drawable/ic_arrow_right"
+                android:drawableTint="@color/green"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

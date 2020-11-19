@@ -19,4 +19,7 @@
     <string name="empty_no_internet_connection">Pas de réseau Internet</string>
     <string name="empty_please_connect">Veuillez vous connecter à un réseau Internet afin d\'accéder aux données</string>
     <string name="empty_container">icone pas de reseau internet</string>
+    <string name="permission_location_description">Afin de vous montrer les vélos volés autour de vous, nous avons besoin de votre localisation</string>
+    <string name="permission_location_button">Autoriser la localisation</string>
+    <string name="permission_skip">Passer</string>
 </resources>

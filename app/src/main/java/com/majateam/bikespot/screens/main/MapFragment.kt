@@ -1,163 +1,103 @@
-package com.majateam.bikespot.screens.main;
+package com.majateam.bikespot.screens.main
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.Polyline;
-import com.majateam.bikespot.R;
-import com.majateam.bikespot.base.BaseFragment;
-import com.majateam.bikespot.model.Bike;
-import com.majateam.bikespot.model.Dock;
-import com.majateam.bikespot.provider.LocationProvider;
-import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import butterknife.BindView;
-import butterknife.OnClick;
-import icepick.State;
+import android.os.Bundle
+import android.view.View
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.annotation.Nullable
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.fragment.app.Fragment
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
+import com.majateam.bikespot.R
+import com.majateam.bikespot.R.string
+import com.majateam.bikespot.model.Bike
+import com.majateam.bikespot.model.Dock
+import com.majateam.bikespot.provider.LocationProvider
+import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.annotations.MarkerOptions
+import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.maps.MapView
+import java.util.*
 
 /**
  * Stolen Bike Created by nmartino on 2017-04-17.
  */
+class MapFragment : Fragment() {
+    var mSubMenu: LinearLayout? = null
+    var mDisplayChoice: TextView? = null
+    var mShowChoice: TextView? = null
+    var mChoiceIcon: ImageView? = null
+    var mShowIcon: ImageView? = null
+    var mBikeSpotStatusLayout: LinearLayout? = null
+    var mBikeSpotStatus: TextView? = null
+    var mBikeSpotTitle: TextView? = null
+    var mBikeSpotDescription: TextView? = null
+    var mBikeSpotBrand: TextView? = null
+    var mLocateUser: FloatingActionButton? = null
+    var mEmptyContainer: LinearLayout? = null
+    var mEmptyIcon: ImageView? = null
+    var mEmptyTitle: TextView? = null
+    var mEmptySubtitle: TextView? = null
+    var mContainer: FrameLayout? = null
+    var mCoordinatorLayout: CoordinatorLayout? = null
+    private val mLocationProvider: LocationProvider? = null
+    var mBikes: ArrayList<Bike>? = null
+    var mDocks: ArrayList<Dock>? = null
+    var mChoice = 0
+    var mCurrentLatitude = 0.0
+    var mCurrentLongitude = 0.0
+    var mMenuVisibilityState = 0
+    var mSpot = LOADING_SPOT
+    private val mLocationHandledFirst = false
+    var mSnackBar: Snackbar? = null
+    private val mInternetConnected = true
+    private val mConnectivityStatus: Int? = null
+    private var mFirstTime: Boolean? = null
+    var mapView: MapView? = null
 
-public class MapFragment extends BaseFragment {
-
-    @BindView(R.id.sub_menu)
-    LinearLayout mSubMenu;
-    @BindView(R.id.display_choice)
-    TextView mDisplayChoice;
-    @BindView(R.id.show_choice_txt)
-    TextView mShowChoice;
-    @BindView(R.id.choice_icon)
-    ImageView mChoiceIcon;
-    @BindView(R.id.show_icon)
-    ImageView mShowIcon;
-    @BindView(R.id.bike_spot_status_layout)
-    LinearLayout mBikeSpotStatusLayout;
-    @BindView(R.id.bike_spot_status)
-    TextView mBikeSpotStatus;
-    @BindView(R.id.bike_spot_title)
-    TextView mBikeSpotTitle;
-    @BindView(R.id.bike_spot_description)
-    TextView mBikeSpotDescription;
-    @BindView(R.id.bike_spot_brand)
-    TextView mBikeSpotBrand;
-    @BindView(R.id.map_user_location)
-    FloatingActionButton mLocateUser;
-    @BindView(R.id.empty_container)
-    LinearLayout mEmptyContainer;
-    @BindView(R.id.empty_icon)
-    ImageView mEmptyIcon;
-    @BindView(R.id.empty_title)
-    TextView mEmptyTitle;
-    @BindView(R.id.empty_subtitle)
-    TextView mEmptySubtitle;
-    @BindView(R.id.container)
-    FrameLayout mContainer;
-    @BindView(R.id.wrapper_coordinator)
-    CoordinatorLayout mCoordinatorLayout;
-
-    private static final int BIKES = 10;
-    private static final int DOCKS = 20;
-    private static final int UNSAFE_SPOT = 30;
-    private static final int NEUTRAL_SPOT = 40;
-    private static final int LOADING_SPOT = 50;
-    private static final int NEUTRAL_DISTANCE = 300;
-
-    private LocationProvider mLocationProvider;
-    @State
-    ArrayList<Bike> mBikes = null;
-    @State
-    ArrayList<Dock> mDocks = null;
-    //private ArrayList<ClusterItem> mClusterItems = null;
-    //private ClusterManager<ClusterItem> mClusterManager;
-    @State
-    int mChoice;
-    @State
-    double mCurrentLatitude;
-    @State
-    double mCurrentLongitude;
-    @State
-    int mMenuVisibilityState;
-    private List<Polyline> mPolylines;
-    @State
-    int mSpot = LOADING_SPOT;
-    private Marker mUserMarker = null;
-    private Circle mCircle = null;
-    private boolean mLocationHandledFirst = false;
-    Snackbar mSnackBar;
-    private boolean mInternetConnected = true;
-    private Integer mConnectivityStatus = null;
-    private Boolean mFirstTime;
-
-    @BindView(R.id.map)
-    MapView mapView;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    override fun onCreate(@Nullable savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         //initEmptyContainer();
         //mSubMenu.setVisibility((mMenuVisibilityState == View.VISIBLE) ? View.VISIBLE : View.GONE);
         //set default choice
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.
-        Mapbox.getInstance(getActivity(), getString(R.string.map_token));
+        activity?.let { Mapbox.getInstance(it, getString(string.mapbox_access_token)) }
         if (savedInstanceState == null) {
-            mChoice = BIKES;
+            mChoice = BIKES
             //mShowChoice.setText(com.majateam.bikespot.R.string.show_docks);
             //mDisplayChoice.setText(com.majateam.bikespot.R.string.bikes);
             //mChoiceIcon.setImageResource(R.drawable.ic_legend_stolen);
             //mShowIcon.setImageResource(R.drawable.ic_legend_dock);
-            mBikes = new ArrayList<>();
-            mDocks = new ArrayList<>();
+            mBikes = ArrayList()
+            mDocks = ArrayList()
         }
 
         //init polylines array
-        mPolylines = new ArrayList<>();
+        //mPolylines = ArrayList()
         //First time the app is launched
-        mFirstTime = true;
-
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(MapboxMap mapboxMap) {
-                mapboxMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(48.13863, 11.57603))
-                        .title("Hello World!")
-                        .snippet("Welcome to my marker."));
-
-            }
-        });
+        mFirstTime = true
+        mapView!!.onCreate(savedInstanceState)
+        mapView!!.getMapAsync { mapboxMap ->
+            mapboxMap.addMarker(MarkerOptions()
+                .position(LatLng(48.13863, 11.57603))
+                .title("Hello World!")
+                .snippet("Welcome to my marker."))
+        }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        mapView.onStart();
+    override fun onStart() {
+        super.onStart()
+        mapView!!.onStart()
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        mapView.onResume();
+    override fun onResume() {
+        super.onResume()
+        mapView!!.onResume()
         /*if (getConnectivityStatus(this) != TYPE_NOT_CONNECTED) {
             mContainer.setVisibility(View.VISIBLE);
             mEmptyContainer.setVisibility(View.GONE);
@@ -180,42 +120,36 @@ public class MapFragment extends BaseFragment {
         }*/
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        mapView.onPause();
+    override fun onPause() {
+        super.onPause()
+        mapView!!.onPause()
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        mapView.onStop();
+    override fun onStop() {
+        super.onStop()
+        mapView!!.onStop()
     }
 
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView!!.onLowMemory()
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
+    override fun onDestroy() {
+        super.onDestroy()
+        mapView!!.onDestroy()
         /*if (mClusterManager != null) {
             mClusterManager.clearItems();
         }*/
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapView!!.onSaveInstanceState(outState)
     }
 
-    @OnClick(R.id.card_view)
-    public void showPopup() {
-        mSubMenu.setVisibility((mSubMenu.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
+    fun showPopup() {
+        mSubMenu!!.visibility = if (mSubMenu!!.visibility == View.VISIBLE) View.GONE else View.VISIBLE
     }
 
     /*@OnClick(R.id.show_choice)
@@ -223,14 +157,7 @@ public class MapFragment extends BaseFragment {
         updateChoice();
         showPopup();
         removeDestination();
-    }*/
-
-    @Override
-    protected int getLayout() {
-        return R.layout.map;
-    }
-
-    /*private void updateChoice() {
+    }*/ /*private void updateChoice() {
         if (mChoice == BIKES) {
             mChoice = DOCKS;
             mShowChoice.setText(com.majateam.bikespot.R.string.show_bikes);
@@ -610,4 +537,15 @@ public class MapFragment extends BaseFragment {
         }
         mConnectivityStatus = connectivityCode;
     }*/
+    protected val layout: Int
+        protected get() = R.layout.map
+
+    companion object {
+        private const val BIKES = 10
+        private const val DOCKS = 20
+        private const val UNSAFE_SPOT = 30
+        private const val NEUTRAL_SPOT = 40
+        private const val LOADING_SPOT = 50
+        private const val NEUTRAL_DISTANCE = 300
+    }
 }

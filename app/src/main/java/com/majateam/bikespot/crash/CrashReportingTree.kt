@@ -5,8 +5,9 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.crashlytics.internal.common.CrashlyticsCore
 import timber.log.Timber.Tree
 import timber.log.Timber.log
+import javax.inject.Inject
 
-class CrashReportingTree : Tree() {
+class CrashReportingTree @Inject constructor() : Tree() {
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
         if (priority == Log.VERBOSE || priority == Log.DEBUG) {
             return

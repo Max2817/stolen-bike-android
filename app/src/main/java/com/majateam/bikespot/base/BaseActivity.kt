@@ -38,7 +38,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     protected abstract fun setSnackBarMessage()
-    protected abstract fun onNetworkConnectionUpdated(connectivityCode: Int?)
+    protected abstract fun onNetworkConnectionUpdated(isConnected: Boolean)
 
     /**
      * Runtime Broadcast receiver inner class to capture internet connectivity events
